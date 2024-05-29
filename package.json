@@ -13,8 +13,10 @@
   "dependencies": {
     "@types/react": "npm:types-react@rc",
     "@types/react-dom": "npm:types-react-dom@rc",
+    "appwrite": "^14.0.1",
     "react": "^19.0.0-rc-38e3b23483-20240529",
-    "react-dom": "^19.0.0-rc-38e3b23483-20240529"
+    "react-dom": "^19.0.0-rc-38e3b23483-20240529",
+    "react-router-dom": "^6.23.1"
   },
   "overrides": {
     "@types/react": "npm:types-react@rc",
@@ -22,6 +24,7 @@
   },
   "devDependencies": {
     "@tauri-apps/cli": "^1.5.14",
+    "@types/node": "^20.12.13",
     "@typescript-eslint/eslint-plugin": "^7.2.0",
     "@typescript-eslint/parser": "^7.2.0",
     "@vitejs/plugin-react-swc": "^3.5.0",
