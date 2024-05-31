@@ -1,16 +1,21 @@
 import { ClientWrapper } from "./ClientWrapper.tsx";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { Homepage } from "./pages/Homepage.tsx";
-import { Login } from "./pages/Login.tsx";
+import { BrowserRouter } from "react-router-dom";
+import RoutesList from "./RoutesList.tsx";
+
+export const routeTransition = {
+  initial: {
+    opacity: 0,
+  },
+  final: {
+    opacity: 100,
+  },
+};
 
 function App() {
   return (
     <BrowserRouter>
       <ClientWrapper>
-        <Routes>
-          <Route path="/" element={<Homepage />} />
-          <Route path="/login" element={<Login />} />
-        </Routes>
+        <RoutesList />
       </ClientWrapper>
     </BrowserRouter>
   );

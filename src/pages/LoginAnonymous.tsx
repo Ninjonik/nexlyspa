@@ -5,21 +5,21 @@ import { Link, useNavigate } from "react-router-dom";
 import { useActionState } from "react";
 import { account } from "../utils/appwrite.ts";
 import { deleteSessions } from "../utils/deleteSessions.ts";
-import { useUserContext } from "../utils/UserContext.tsx";
 import { UserAuthObject } from "../utils/interfaces/UserObject.ts";
+import { useUserContext } from "../utils/UserContext.tsx";
 
-export const Login = () => {
+export const LoginAnonymous = () => {
   const navigate = useNavigate();
   const { getUserData } = useUserContext();
 
   const handleLogin = async (_prevState: null, queryData: FormData) => {
-    const email = queryData.get("email") as string;
-    const password = queryData.get("password") as string;
-    if (!email || !password) return "Please fill all the fields.";
-
+    const username = queryData.get("username") as string;
+    if (!username) return "Please fill all the fields.";
     await deleteSessions();
+
     try {
-      await account.createEmailPasswordSession(email, password);
+      await account.createAnonymousSession();
+      await account.updateName(username);
       const newAccount = (await account.get()) as UserAuthObject;
       await getUserData(newAccount);
       navigate("/");
@@ -34,31 +34,26 @@ export const Login = () => {
     <main className="w-screen h-screen flex justify-center items-center bg-[url('/img/background.svg')] bg-cover">
       <section
         className={
-          "h-full w-full md:h-auto md:w-auto p-8 flex flex-col justify-center items-center bg-base-100 rounded-lg shadow-md text-center gap-4"
+          "h-full md:h-auto md:w-auto p-8 flex flex-col justify-center items-center bg-base-100 rounded-lg shadow-md text-center gap-4"
         }
       >
-        <h2>Welcome back!</h2>
-        <h3>We're so excited to see you again!</h3>
+        <h2>Welcome!</h2>
+        <h3>
+          We respect your privacy and that's <br />
+          why having a temporary anonymous <br />
+          account is respected.
+        </h3>
         <h4 className={"text-red-500"}>{message}</h4>
         <form className={"flex flex-col gap-4"} action={formAction}>
           <input
             type="text"
-            name={"email"}
-            placeholder="Enter your email"
+            name={"username"}
+            placeholder="Enter your username"
             required={true}
           />
-          <input
-            type="password"
-            name={"password"}
-            placeholder="Enter your password"
-            required={true}
-          />
-          <Link to={"/reset-password"}>Forgot your password?</Link>
-          <Link to={"/login/anonymous"}>
-            Continue with one-time anonymous account?
-          </Link>
+          <Link to={"/login"}>Log in with normal account</Link>
           <button type={"submit"} className={"w-full"}>
-            Log in
+            Create a temporary anonymous account
           </button>
           <span>
             Need an account?&nbsp;
