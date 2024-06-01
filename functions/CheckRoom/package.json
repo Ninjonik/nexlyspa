@@ -1,5 +1,5 @@
 {
-  "name": "delete-user",
+  "name": "check-room",
   "version": "1.0.0",
   "description": "",
   "main": "src/main.js",
