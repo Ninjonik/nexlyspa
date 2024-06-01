@@ -1,4 +1,32 @@
+// @ts-ignore
+import { useActionState } from "react";
+
 export const Homepage = () => {
+  const handleRoomSubmit = async (_prevState: null, queryData: FormData) => {
+    const name = queryData.get("name");
+    const description = queryData.get("description");
+    const code = queryData.get("code");
+
+    // Handle the common stuff
+
+    if (code) {
+      // Handle joining a room
+      if (!code) return "Please enter a valid code.";
+    } else {
+      // Handle creating a room
+      if (!name || !description)
+        return "Please fill all the fields - Room's name and its description.";
+    }
+
+    // Handle the common stuff
+  };
+
+  const [messageJoin, formActionJoin] = useActionState(handleRoomSubmit, null);
+  const [messageCreate, formActionCreate] = useActionState(
+    handleRoomSubmit,
+    null,
+  );
+
   return (
     <section
       className={"md:visible w-4/5 h-full bg-base-200 p-8 flex flex-col gap-8"}
@@ -10,20 +38,27 @@ export const Homepage = () => {
           <h3 className={"text-primary font-semibold"}>
             Join an existing room
           </h3>
+          <span className={"text-primary"}>{messageJoin}</span>
           <form
-            action=""
+            action={formActionJoin}
             className={"flex flex-col w-full gap-4 h-full justify-between"}
           >
             <div className={"flex flex-col gap-8"}>
-              <input type="text" placeholder="New room's name" />
+              <input
+                type="text"
+                placeholder="Room's code"
+                name={"code"}
+                required={true}
+              />
             </div>
             <button type="submit">Join an existing room</button>
           </form>
         </div>
         <div className={"w-1/2 flex flex-col gap-2 h-full"}>
           <h3 className={"text-primary font-semibold"}>Create a new room</h3>
+          <span className={"text-primary"}>{messageCreate}</span>
           <form
-            action=""
+            action={formActionCreate}
             className={"flex flex-col w-full gap-4 h-full justify-between"}
           >
             <div className={"flex flex-row gap-8"}>
@@ -31,11 +66,15 @@ export const Homepage = () => {
                 type="text"
                 placeholder="New room's name"
                 className={"w-1/2"}
+                name={"name"}
+                required={true}
               />
               <input
                 type="text"
                 placeholder="New room's description"
                 className={"w-1/2"}
+                name={"description"}
+                required={true}
               />
             </div>
             <button type="submit">Create a new room</button>
