@@ -4,18 +4,17 @@ import { Link, useNavigate } from "react-router-dom";
 // @ts-ignore
 import { useActionState } from "react";
 import { account } from "../utils/appwrite.ts";
-import { deleteSessions } from "../utils/deleteSessions.ts";
 import { UserAuthObject } from "../utils/interfaces/UserObject.ts";
 import { useUserContext } from "../utils/UserContext.tsx";
 
 export const LoginAnonymous = () => {
   const navigate = useNavigate();
-  const { getUserData } = useUserContext();
+  const { getUserData, logoutUser } = useUserContext();
 
   const handleLogin = async (_prevState: null, queryData: FormData) => {
     const username = queryData.get("username") as string;
     if (!username) return "Please fill all the fields.";
-    await deleteSessions();
+    await logoutUser();
 
     try {
       await account.createAnonymousSession();

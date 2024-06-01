@@ -6,28 +6,31 @@ import { useActionState } from "react";
 import { account } from "../utils/appwrite.ts";
 import { useUserContext } from "../utils/UserContext.tsx";
 import { UserAuthObject } from "../utils/interfaces/UserObject.ts";
+import { ID } from "appwrite";
 
-export const Login = () => {
+export const Register = () => {
   const navigate = useNavigate();
   const { getUserData, logoutUser } = useUserContext();
 
-  const handleLogin = async (_prevState: null, queryData: FormData) => {
+  const handleRegister = async (_prevState: null, queryData: FormData) => {
+    const username = queryData.get("username") as string;
     const email = queryData.get("email") as string;
     const password = queryData.get("password") as string;
     if (!email || !password) return "Please fill all the fields.";
 
     await logoutUser();
     try {
+      await account.create(ID.unique(), email, password, username);
       await account.createEmailPasswordSession(email, password);
       const newAccount = (await account.get()) as UserAuthObject;
       await getUserData(newAccount);
       navigate("/");
     } catch (e) {
-      return "Invalid email/password.";
+      return (e as Error).message;
     }
   };
 
-  const [message, formAction] = useActionState(handleLogin, null);
+  const [message, formAction] = useActionState(handleRegister, null);
 
   return (
     <main className="w-screen h-screen flex justify-center items-center bg-[url('/img/background.svg')] bg-cover">
@@ -36,10 +39,16 @@ export const Login = () => {
           "h-full w-full md:h-auto md:w-auto p-8 flex flex-col justify-center items-center bg-base-100 rounded-lg shadow-md text-center gap-4"
         }
       >
-        <h2>Welcome back!</h2>
-        <h3>We're so excited to see you again!</h3>
+        <h2>Welcome to Nexly!</h2>
+        <h3>We're so excited to meet you!</h3>
         <h4 className={"text-red-500"}>{message}</h4>
         <form className={"flex flex-col gap-4"} action={formAction}>
+          <input
+            type="text"
+            name={"username"}
+            placeholder="Enter your username"
+            required={true}
+          />
           <input
             type="email"
             name={"email"}
@@ -49,19 +58,18 @@ export const Login = () => {
           <input
             type="password"
             name={"password"}
-            placeholder="Enter your password"
+            placeholder="Enter a password"
             required={true}
           />
-          <Link to={"/reset-password"}>Forgot your password?</Link>
           <Link to={"/login/anonymous"}>
             Continue with a one-time anonymous account?
           </Link>
           <button type={"submit"} className={"w-full"}>
-            Log in
+            Create a new account
           </button>
           <span>
-            Need an account?&nbsp;
-            <Link to={"/register"}>Register</Link>
+            Already have an account?&nbsp;
+            <Link to={"/login"}>Log in</Link>
           </span>
         </form>
       </section>

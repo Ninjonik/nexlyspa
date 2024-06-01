@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { FaGear, FaMicrophone } from "react-icons/fa6";
 import { TbHeadphonesOff, TbLogout2 } from "react-icons/tb";
 import { useUserContext } from "../utils/UserContext.tsx";
+import { IoMdCheckmarkCircle } from "react-icons/io";
 
 export const Homepage = () => {
   const { user } = useUserContext();
@@ -43,22 +44,47 @@ export const Homepage = () => {
                 <Avatar />
                 <div className={"flex flex-col text-start justify-center"}>
                   <h3 className={"text-primary font-bold"}>{user.name}</h3>
-                  <h4>Status</h4>
+                  <h4>
+                    {user.emailVerification ? "Verified" : "Not verified"}
+                  </h4>
                 </div>
               </div>
               <div
                 className={"flex flex-row gap-4 justify-center items-center"}
               >
-                <Link to={"/logout"} className={"font-bold text-2xl"}>
+                <Link
+                  to={"/logout"}
+                  className={"font-bold text-xl"}
+                  title={"Toggle microphone"}
+                >
                   <FaMicrophone />
                 </Link>
-                <Link to={"/logout"} className={"font-bold text-2xl"}>
+                <Link
+                  to={"/logout"}
+                  className={"font-bold text-xl"}
+                  title={"Toggle headphones"}
+                >
                   <TbHeadphonesOff />
                 </Link>
-                <Link to={"/logout"} className={"font-bold text-2xl"}>
+                <Link
+                  to={"/register/verify"}
+                  className={"font-bold text-xl"}
+                  title={"Verify your account"}
+                >
+                  <IoMdCheckmarkCircle />
+                </Link>
+                <Link
+                  to={"/logout"}
+                  className={"font-bold text-xl"}
+                  title={"Settings"}
+                >
                   <FaGear />
                 </Link>
-                <Link to={"/logout"} className={"font-bold text-2xl"}>
+                <Link
+                  to={"/logout"}
+                  className={"font-bold text-xl"}
+                  title={"Log out"}
+                >
                   <TbLogout2 />
                 </Link>
               </div>

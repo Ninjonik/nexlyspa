@@ -33,12 +33,12 @@ export interface UserAuthObject {
 export interface UserObject {
   name: string;
   avatar: string;
-  token: string;
   $id: string;
   $createdAt: string;
   $updatedAt: string;
   $permissions: string[];
-  room: RoomObject[];
+  rooms: RoomObject[];
+  adminRooms: RoomObject[];
   $databaseId: string;
   $collectionId: string;
 }

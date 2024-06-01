@@ -5,7 +5,7 @@ import React, {
   useState,
   useEffect,
 } from "react";
-import { account } from "./appwrite.ts";
+import { account, database, databases } from "./appwrite.ts";
 import { getUserDBData } from "./getUserDBData.ts";
 import {
   UserAuthObject,
@@ -13,13 +13,12 @@ import {
   UserObject,
 } from "./interfaces/UserObject.ts";
 import { useLocation, useNavigate } from "react-router-dom";
-import { deleteSessions } from "./deleteSessions.ts";
 
 interface UserContextState {
   user: UserCombinedObject | null;
   setUser: React.Dispatch<React.SetStateAction<UserCombinedObject | null>>;
-  logout: () => Promise<void>;
   getUserData: (userAccount: UserAuthObject) => Promise<void>;
+  logoutUser: () => Promise<void>;
 }
 
 interface UserContextProps {
@@ -49,11 +48,6 @@ export const UserContextProvider = ({ children }: UserContextProps) => {
   const currentRoute = useLocation();
   const currentPage = currentRoute.pathname;
 
-  const logout = async () => {
-    await deleteSessions();
-    navigate("/login");
-  };
-
   const initializeUserData = async () => {
     try {
       const userAccount: UserAuthObject =
@@ -80,9 +74,30 @@ export const UserContextProvider = ({ children }: UserContextProps) => {
       };
       setUser(combinedUserObject);
     } catch (e) {
-      if (!noAuthRequiredRoutes.includes(currentPage)) navigate("/login");
-      console.info("user not logged in");
+      const userDBData = (await databases.createDocument(
+        database,
+        "users",
+        userAccount.$id,
+        {
+          name: userAccount.name,
+          avatar: "defaultAvatar",
+        },
+      )) as UserObject;
+      const combinedUserObject: UserCombinedObject = {
+        ...userAccount,
+        ...userDBData,
+      };
+      setUser(combinedUserObject);
       return;
+    }
+  };
+
+  const logoutUser = async () => {
+    try {
+      await account.deleteSessions();
+      setUser(null);
+    } catch (error) {
+      /* empty */
     }
   };
 
@@ -93,7 +108,7 @@ export const UserContextProvider = ({ children }: UserContextProps) => {
   // if (noAuthRequiredRoutes.includes(currentPage)) return children;
 
   return (
-    <UserContext.Provider value={{ user, setUser, logout, getUserData }}>
+    <UserContext.Provider value={{ user, setUser, getUserData, logoutUser }}>
       {children}
     </UserContext.Provider>
   );
