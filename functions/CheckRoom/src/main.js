@@ -10,6 +10,11 @@ export default async ({ req, res }) => {
 
   if (req.method === "GET") {
     const roomId = req.body.roomId;
+    if (!roomId)
+      return res.json({
+        success: false,
+        message: "Some of the required parameters is missing.",
+      });
 
     try {
       await database.getDocument("nexly", "rooms", roomId);
@@ -24,7 +29,7 @@ export default async ({ req, res }) => {
       return res.json({
         success: true,
         message: "Room with the specified room code does not exist.",
-        status: true,
+        status: false,
       });
     }
   }
