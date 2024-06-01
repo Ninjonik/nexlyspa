@@ -5,7 +5,7 @@ import React, {
   useState,
   useEffect,
 } from "react";
-import { account, database, databases } from "./appwrite.ts";
+import { account, client, database, databases } from "./appwrite.ts";
 import { getUserDBData } from "./getUserDBData.ts";
 import {
   UserAuthObject,
@@ -25,7 +25,7 @@ interface UserContextProps {
   children: ReactNode;
 }
 
-const noAuthRequiredRoutes = [
+export const noAuthRequiredRoutes = [
   "/login",
   "/login/anonymous",
   "/register",
@@ -104,6 +104,21 @@ export const UserContextProvider = ({ children }: UserContextProps) => {
   useEffect(() => {
     initializeUserData();
   }, []);
+
+  useEffect(() => {
+    if (!user || !user?.$id) return;
+    const unsubscribe = client.subscribe(
+      `databases.${database}.collections.users.documents.${user.$id}`,
+      (response) => {
+        const payload = response.payload as UserObject;
+        setUser((prevUser) => (prevUser ? { ...prevUser, ...payload } : null));
+      },
+    );
+
+    return () => {
+      unsubscribe();
+    };
+  }, [user?.$id]);
 
   // if (noAuthRequiredRoutes.includes(currentPage)) return children;
 

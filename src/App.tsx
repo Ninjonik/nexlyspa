@@ -1,6 +1,7 @@
 import { ClientWrapper } from "./ClientWrapper.tsx";
 import { BrowserRouter } from "react-router-dom";
 import RoutesList from "./RoutesList.tsx";
+import { UserContextProvider } from "./utils/UserContext.tsx";
 
 export const routeTransition = {
   initial: {
@@ -14,9 +15,11 @@ export const routeTransition = {
 function App() {
   return (
     <BrowserRouter>
-      <ClientWrapper>
-        <RoutesList />
-      </ClientWrapper>
+      <UserContextProvider>
+        <ClientWrapper>
+          <RoutesList />
+        </ClientWrapper>
+      </UserContextProvider>
     </BrowserRouter>
   );
 }
