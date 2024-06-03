@@ -52,7 +52,7 @@ export const Homepage = () => {
         }),
         false,
         undefined,
-        ExecutionMethod.GET,
+        ExecutionMethod.POST,
       );
       const response = JSON.parse(result.responseBody);
       if (!response.success || !response.status)
