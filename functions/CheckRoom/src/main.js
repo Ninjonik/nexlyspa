@@ -9,7 +9,8 @@ export default async ({ req, res }) => {
   const database = new Databases(client);
 
   if (req.method === "GET") {
-    const roomId = req.body["roomId"];
+    const body = JSON.parse(req.body);
+    const roomId = body?.roomId;
     if (!roomId)
       return res.json({
         success: false,
