@@ -15,7 +15,7 @@ export default async ({ req, res }) => {
   const jwtDatabases = new Databases(jwtClient);
   const jwtAccount = new Account(jwtClient);
 
-  if (req.method === "GET") {
+  if (req.method === "POST") {
     const body = JSON.parse(req.body);
     const jwt = body?.jwt;
     const roomName = body?.roomName;

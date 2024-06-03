@@ -1,19 +1,27 @@
 // @ts-ignore
-import { useActionState } from "react";
-import { functions } from "../utils/appwrite.ts";
+import { useActionState, useState } from "react";
+import { account, functions } from "../utils/appwrite.ts";
 import { ExecutionMethod } from "appwrite";
 
 export const Homepage = () => {
+  const [pending, setPending] = useState<boolean>(false);
+
   const handleRoomSubmit = async (_prevState: null, queryData: FormData) => {
+    setPending(true);
     const name = queryData.get("name");
     const description = queryData.get("description");
     const code = queryData.get("code");
+
+    const handleReturn = (message: string) => {
+      setPending(false);
+      return message;
+    };
 
     // Handle the common stuff
 
     if (code) {
       // Handle joining a room
-      if (!code) return "Please enter a valid code.";
+      if (!code) return handleReturn("Please enter a valid code.");
 
       // Validate room's code
       const result = await functions.createExecution(
@@ -25,12 +33,30 @@ export const Homepage = () => {
         undefined,
         ExecutionMethod.GET,
       );
-      console.info(result);
-      console.info(result.responseBody);
+      const response = JSON.parse(result.responseBody);
+      if (!response.success || !response.status)
+        return handleReturn("Room with the specified code does not exist.");
     } else {
       // Handle creating a room
       if (!name || !description)
-        return "Please fill all the fields - Room's name and its description.";
+        return handleReturn("Please fill all the fields.");
+
+      const jwt = await account.createJWT();
+      const result = await functions.createExecution(
+        "createRoom",
+        JSON.stringify({
+          jwt: jwt,
+          roomName: name,
+          roomDescription: description,
+          roomAvatar: "defaultAvatar",
+        }),
+        false,
+        undefined,
+        ExecutionMethod.GET,
+      );
+      const response = JSON.parse(result.responseBody);
+      if (!response.success || !response.status)
+        return handleReturn("Room with the specified code does not exist.");
     }
 
     // Handle the common stuff
@@ -42,6 +68,7 @@ export const Homepage = () => {
     null,
   );
 
+  console.info(pending);
   return (
     <section
       className={"md:visible w-4/5 h-full bg-base-200 p-8 flex flex-col gap-8"}
@@ -66,7 +93,9 @@ export const Homepage = () => {
                 required={true}
               />
             </div>
-            <button type="submit">Join an existing room</button>
+            <button type="submit" disabled={pending}>
+              Join an existing room
+            </button>
           </form>
         </div>
         <div className={"w-1/2 flex flex-col gap-2 h-full"}>
@@ -92,7 +121,9 @@ export const Homepage = () => {
                 required={true}
               />
             </div>
-            <button type="submit">Create a new room</button>
+            <button type="submit" disabled={pending}>
+              Create a new room
+            </button>
           </form>
         </div>
       </div>
