@@ -1,5 +1,7 @@
 // @ts-ignore
 import { useActionState } from "react";
+import { functions } from "../utils/appwrite.ts";
+import { ExecutionMethod } from "appwrite";
 
 export const Homepage = () => {
   const handleRoomSubmit = async (_prevState: null, queryData: FormData) => {
@@ -12,6 +14,19 @@ export const Homepage = () => {
     if (code) {
       // Handle joining a room
       if (!code) return "Please enter a valid code.";
+
+      // Validate room's code
+      const result = await functions.createExecution(
+        "checkRoom",
+        JSON.stringify({
+          roomId: code,
+        }),
+        false,
+        undefined,
+        ExecutionMethod.GET,
+      );
+      console.info(result);
+      console.info(result.responseBody);
     } else {
       // Handle creating a room
       if (!name || !description)

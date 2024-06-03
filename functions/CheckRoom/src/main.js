@@ -10,6 +10,7 @@ export default async ({ req, res }) => {
 
   if (req.method === "GET") {
     const roomId = req.body.roomId;
+    console.log(req.body);
     if (!roomId)
       return res.json({
         success: false,
