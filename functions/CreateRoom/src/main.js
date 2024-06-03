@@ -16,12 +16,13 @@ export default async ({ req, res }) => {
   const jwtAccount = new Account(jwtClient);
 
   if (req.method === "GET") {
-    const jwt = req.body.jwt;
-    const roomName = req.body.roomName;
-    const roomDescription = req.body.roomDescription;
-    const roomAvatar = req.body.roomAvatar;
+    const body = JSON.parse(req.body);
+    const jwt = body?.jwt;
+    const roomName = body?.roomName;
+    const roomDescription = body?.roomDescription;
+    const roomAvatar = body?.roomAvatar;
 
-    if (!roomId || !roomName || !roomDescription || !roomAvatar)
+    if (!jwt || !roomName || !roomDescription || !roomAvatar)
       return res.json({
         success: false,
         message: "Some of the required parameters is missing.",
