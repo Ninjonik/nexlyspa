@@ -16,7 +16,6 @@ const generateUniqueRoomCode = async (functions) => {
         roomId: generatedCode,
       }),
       false,
-        false,
         undefined,
         ExecutionMethod.GET,
     );
