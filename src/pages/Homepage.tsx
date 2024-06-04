@@ -45,7 +45,7 @@ export const Homepage = () => {
       const result = await functions.createExecution(
         "createRoom",
         JSON.stringify({
-          jwt: jwt,
+          jwt: jwt.jwt,
           roomName: name,
           roomDescription: description,
           roomAvatar: "defaultAvatar",

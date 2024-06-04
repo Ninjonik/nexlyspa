@@ -67,13 +67,13 @@ export default async ({ req, res }) => {
       if (!account || !account.$id) {
         return res.json({
           success: false,
-          message: "Invalid JWT",
+          message: "Invalid Account JWT",
         });
       }
     } catch (e) {
       return res.json({
         success: false,
-        message: "Invalid JWT",
+        message: "Invalid JWT Token",
       });
     }
 
