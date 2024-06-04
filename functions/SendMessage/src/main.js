@@ -23,14 +23,14 @@ export default async ({ req, res }) => {
   const jwtAccount = new Account(jwtClient);
 
   if (req.method === "POST") {
-    console.log(req.body);
+    log(req.body);
     const body = JSON.parse(req.body);
-    console.log(body);
+    log(body);
     const jwt = body?.jwt;
     const message = body?.message;
     const attachments = body?.attachments;
     const roomId = body?.roomId;
-    console.log("a");
+    log("a");
     if (!roomId || !jwt || (!message && !attachments && attachments.length < 1))
       return res.json({
         success: false,
@@ -38,7 +38,7 @@ export default async ({ req, res }) => {
       });
 
     let account;
-    console.log("b");
+    log("b");
     try {
       jwtClient.setJWT(jwt);
       account = await jwtAccount.get();
@@ -54,7 +54,7 @@ export default async ({ req, res }) => {
         message: "Invalid JWT Token",
       });
     }
-    console.log("c");
+    log("c");
     try {
       const roomData = await jwtDatabases.getDocument(
         database,
@@ -67,7 +67,7 @@ export default async ({ req, res }) => {
           success: false,
           message: "Specified room does not exist / user is not in the room.",
         });
-      console.log("d");
+      log("d");
       let permissions = [];
       let userInRoom = false;
       roomData.users.map((user) => {
@@ -80,7 +80,7 @@ export default async ({ req, res }) => {
           success: false,
           message: "User is not in the room.",
         });
-      console.log("e");
+      log("e");
       const result = await jwtDatabases.createDocument(
         database,
         "messages",
@@ -94,8 +94,8 @@ export default async ({ req, res }) => {
         permissions,
       );
 
-      console.log("RESULT:", result);
-      console.log("f");
+      log("RESULT:", result);
+      log("f");
       return res.json({
         success: false,
         message: "Message successfully sent!",
