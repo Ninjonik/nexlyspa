@@ -82,25 +82,29 @@ export default async ({ req, res }) => {
     try {
       const generatedCode = await generateUniqueRoomCode(functions);
 
+      const newRoom = {
+        $id: generatedCode,
+        name: roomName,
+        closed: false,
+        avatar: roomAvatar,
+        description: roomDescription,
+        $permissions: [
+          Permission.read(Role.user(account.$id)),
+          Permission.create(Role.user(account.$id)),
+          Permission.update(Role.user(account.$id)),
+          Permission.delete(Role.user(account.$id)),
+          Permission.read(Role.any()),
+        ],
+      }
       const newUser = await database.updateDocument(
         "nexly",
         "users",
         account.$id,
         {
-          room: {
-            $id: generatedCode,
-            name: roomName,
-            closed: false,
-            avatar: roomAvatar,
-            description: roomDescription,
-            $permissions: [
-              Permission.read(Role.user(account.$id)),
-              Permission.create(Role.user(account.$id)),
-              Permission.update(Role.user(account.$id)),
-              Permission.delete(Role.user(account.$id)),
-              Permission.read(Role.any()),
-            ],
-          },
+          rooms: [
+              ...account.rooms,
+              newRoom
+          ]
         },
       );
 
@@ -117,6 +121,7 @@ export default async ({ req, res }) => {
         message: "Unknown error.",
       });
     } catch (err) {
+      console.log(err);
       return res.json({
         success: true,
         message: "Cannot create a room with specified arguments...",
