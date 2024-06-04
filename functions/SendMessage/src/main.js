@@ -72,38 +72,38 @@ export default async ({ req, res }) => {
         if (user.$id === account.$id) userInRoom = true;
       });
 
-      // if (!userInRoom)
-      //   return res.json({
-      //     success: false,
-      //     message: "User is not in the room.",
-      //   });
+      if (!userInRoom)
+        return res.json({
+          success: false,
+          message: "User is not in the room.",
+        });
 
-      // const result = await jwtDatabases.createDocument(
-      //   database,
-      //   "messages",
-      //   ID.unique(),
-      //   {
-      //     room: roomId,
-      //     author: account.$id,
-      //     message: message,
-      //     attachments: attachments,
-      //   },
-      //   permissions,
-      // );
+      const result = await jwtDatabases.createDocument(
+        database,
+        "messages",
+        ID.unique(),
+        {
+          room: roomId,
+          author: account.$id,
+          message: message,
+          attachments: attachments,
+        },
+        permissions,
+      );
 
       console.log("RESULT:", result);
 
-      // return res.json({
-      //   success: false,
-      //   message: "Message successfully sent!",
-      //   data: result,
-      // });
+      return res.json({
+        success: false,
+        message: "Message successfully sent!",
+        data: result,
+      });
     } catch (error) {
-      console.error("Error creating a message:", error);
-      return Response.json(
-        { error: "There has been an error while processing your request" },
-        { status: 500 },
-      );
+      console.log("Error creating a message:", error);
+      return res.json({
+        success: false,
+        message: "There has been an error while processing your request",
+      });
     }
   }
 
