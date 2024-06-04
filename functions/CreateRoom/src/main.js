@@ -1,4 +1,4 @@
-import { Client, Databases, Account, Permission, Role, Functions } from "node-appwrite";
+import { Client, Databases, Account, Permission, Role, Functions, ExecutionMethod } from "node-appwrite";
 import { generate } from "random-words";
 
 const generateUniqueRoomCode = async (functions) => {
@@ -15,7 +15,10 @@ const generateUniqueRoomCode = async (functions) => {
       JSON.stringify({
         roomId: generatedCode,
       }),
-      false
+      false,
+        false,
+        undefined,
+        ExecutionMethod.GET,
     );
 
     const response = JSON.parse(result.responseBody);
