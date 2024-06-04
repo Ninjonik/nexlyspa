@@ -1,17 +1,35 @@
 import { useNavigate, useParams } from "react-router-dom";
+import {FullscreenLoading} from "../components/FullscreenLoading.tsx";
+import {useEffect, useState} from "react";
+import RoomObject from "../utils/interfaces/RoomObject.ts";
+import {useRoomsContext} from "../utils/RoomsContext.tsx";
 
 export const Room = () => {
   const navigate = useNavigate();
   const { roomId } = useParams();
-  if (!roomId) return navigate("/");
+  const [room, setRoom] = useState<null | RoomObject>(null);
+  const {rooms} = useRoomsContext();
+
+  useEffect(() => {
+    if (roomId && rooms && rooms[roomId]){
+      setRoom(rooms[roomId])
+    }
+  }, [rooms]);
+
+  if(!roomId) {
+    navigate("/");
+    return <FullscreenLoading />;
+  }
+
+  if(!room) return <FullscreenLoading />;
 
   return (
     <section
-      className={"md:visible w-4/5 h-full bg-base-200 p-8 flex flex-col gap-8"}
+      className={"grid grid-cols-12 grid-rows-12"}
     >
-      <h2 className={"text-center text-5xl"}>Nexly</h2>
-      <hr className={"divider divider-primary"} />
-      <h3>{roomId}</h3>
+      <nav className={"col-span-12 row-span-1 flex flex-row"}>
+        <h2 className={"text-center"}>Room: {room.name}</h2>
+      </nav>
     </section>
   );
 };

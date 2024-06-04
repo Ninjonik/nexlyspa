@@ -111,6 +111,7 @@ export const UserContextProvider = ({ children }: UserContextProps) => {
       `databases.${database}.collections.users.documents.${user.$id}`,
       (response) => {
         const payload = response.payload as UserObject;
+        console.log(payload);
         setUser((prevUser) => (prevUser ? { ...prevUser, ...payload } : null));
       },
     );

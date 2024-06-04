@@ -114,7 +114,7 @@ export default async ({ req, res }) => {
         },
       );
 
-      if (newUser && newUser.room && newUser.room.$id) {
+      if (newUser) {
         return res.json({
           success: true,
           message: "Successfully created a new room!",

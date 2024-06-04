@@ -14,3 +14,11 @@ export default interface RoomObject {
   $databaseId: string;
   $collectionId: string;
 }
+
+export interface RoomObjectArray {
+  [roomId: string]: RoomObject;
+}
+
+export interface RoomObjectArray {
+
+}

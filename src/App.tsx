@@ -2,6 +2,7 @@ import { ClientWrapper } from "./ClientWrapper.tsx";
 import { BrowserRouter } from "react-router-dom";
 import RoutesList from "./RoutesList.tsx";
 import { UserContextProvider } from "./utils/UserContext.tsx";
+import {RoomsContextProvider} from "./utils/RoomsContext.tsx";
 
 export const routeTransition = {
   initial: {
@@ -16,9 +17,11 @@ function App() {
   return (
     <BrowserRouter>
       <UserContextProvider>
-        <ClientWrapper>
-          <RoutesList />
-        </ClientWrapper>
+        <RoomsContextProvider>
+          <ClientWrapper>
+            <RoutesList />
+          </ClientWrapper>
+        </RoomsContextProvider>
       </UserContextProvider>
     </BrowserRouter>
   );

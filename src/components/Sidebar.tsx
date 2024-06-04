@@ -6,9 +6,11 @@ import { IoMdCheckmarkCircle } from "react-icons/io";
 import { useUserContext } from "../utils/UserContext.tsx";
 import { FullscreenLoading } from "./FullscreenLoading.tsx";
 import { RoomListItem } from "./sidebar/RoomListItem.tsx";
+import {useRoomsContext} from "../utils/RoomsContext.tsx";
 
 export const Sidebar = () => {
   const { user } = useUserContext();
+  const {rooms} = useRoomsContext();
 
   if (!user) return <FullscreenLoading />;
 
@@ -21,9 +23,7 @@ export const Sidebar = () => {
         <section
           className={"flex flex-col w-full h-full overflow-y-auto gap-4 px-8"}
         >
-          {user.rooms.map((room) => (
-            <RoomListItem room={room} />
-          ))}
+          {rooms && Array.from(Object.entries(rooms), ([key, room]) => <RoomListItem key={key + "_rli"} room={room} />)}
         </section>
         <section className={"flex p-2 border-t-2 border-primary"}>
           <div className={"flex flex-row w-full gap-4 p-2"}>
