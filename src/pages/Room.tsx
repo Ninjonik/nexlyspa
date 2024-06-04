@@ -3,6 +3,11 @@ import {FullscreenLoading} from "../components/FullscreenLoading.tsx";
 import {useEffect, useState} from "react";
 import RoomObject from "../utils/interfaces/RoomObject.ts";
 import {useRoomsContext} from "../utils/RoomsContext.tsx";
+import Avatar from "../components/Avatar.tsx";
+import {MdCall} from "react-icons/md";
+import {FaUsers} from "react-icons/fa6";
+import {IoMdExit} from "react-icons/io";
+import {Textarea} from "../components/Room/TextArea.tsx";
 
 export const Room = () => {
   const navigate = useNavigate();
@@ -14,7 +19,7 @@ export const Room = () => {
     if (roomId && rooms && rooms[roomId]){
       setRoom(rooms[roomId])
     }
-  }, [rooms]);
+  }, [rooms, roomId]);
 
   if(!roomId) {
     navigate("/");
@@ -25,11 +30,28 @@ export const Room = () => {
 
   return (
     <section
-      className={"grid grid-cols-12 grid-rows-12"}
+      className={"grid grid-cols-12 grid-rows-12 w-full h-full"}
     >
-      <nav className={"col-span-12 row-span-1 flex flex-row"}>
-        <h2 className={"text-center"}>Room: {room.name}</h2>
+      <nav className={"col-span-12 row-span-1 flex flex-row p-2 items-center mx-12 justify-between"}>
+        <div className={"flex flex-row gap-4"}>
+          <Avatar/>
+          <div className={"flex flex-col text-start justify-center"}>
+            <h3 className={"text-primary font-bold"}>{room.name}</h3>
+            <h4>{room.description}</h4>
+          </div>
+        </div>
+        <div className={"flex flex-row items-center gap-4"}>
+          <a title={"Call"} className={"text-4xl"}><MdCall /></a>
+          <a title={"Toggle users sidebar"} className={"text-4xl"}><FaUsers /></a>
+          <a title={"Leave the room"} className={"text-4xl"}><IoMdExit /></a>
+        </div>
       </nav>
+      <section className={"col-span-12 row-span-10 bg-base-200"}>
+
+      </section>
+      <footer className={"col-span-12 row-span-1 flex justify-center items-center"}>
+        <Textarea room={room} />
+      </footer>
     </section>
   );
 };
