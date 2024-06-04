@@ -28,6 +28,25 @@ export const Textarea = ({ className, room }: TextareaProps) => {
   const [submitting, setSubmitting] = useState<boolean>(false);
   const { user } = useUserContext();
 
+  useEffect(() => {
+    const keyDownHandler = (event: {
+      key: string;
+      shiftKey: boolean;
+      preventDefault: () => void;
+    }) => {
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        const attachmentsToSend = attachments || [];
+        if (!text && attachmentsToSend.length < 1) return null;
+        handleSubmit(text, attachmentsToSend);
+      }
+    };
+
+    document.addEventListener("keydown", keyDownHandler);
+
+    return () => document.removeEventListener("keydown", keyDownHandler);
+  }, [text, attachments]);
+
   const handleSubmit = useCallback(
     async (message: string = "", attachmentsToSend: File[] = []) => {
       setSubmitting(true);

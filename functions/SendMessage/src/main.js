@@ -23,7 +23,9 @@ export default async ({ req, res }) => {
   const jwtAccount = new Account(jwtClient);
 
   if (req.method === "POST") {
+    console.log(req.body);
     const body = JSON.parse(req.body);
+    console.log(body);
     const jwt = body?.jwt;
     const message = body?.message;
     const attachments = body?.attachments;
