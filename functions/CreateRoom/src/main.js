@@ -96,15 +96,17 @@ export default async ({ req, res }) => {
           Permission.read(Role.any()),
         ],
       }
+
+      console.log(account);
+      console.log(account.rooms);
+      const newRooms = account.rooms ? [...account.rooms, newRoom] : [newRoom]
+
       const newUser = await database.updateDocument(
         "nexly",
         "users",
         account.$id,
         {
-          rooms: [
-              ...account.rooms,
-              newRoom
-          ]
+          rooms: newRooms
         },
       );
 
