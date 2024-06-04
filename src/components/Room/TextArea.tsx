@@ -1,4 +1,11 @@
-import React, { useCallback, useEffect, useState } from "react";
+// @ts-ignore
+import React, {
+  useEffect,
+  useState,
+  useActionState,
+  useRef,
+  MutableRefObject,
+} from "react";
 import { FaPlus } from "react-icons/fa";
 import {
   AiOutlineDelete,
@@ -16,17 +23,25 @@ import Tippy from "@tippyjs/react";
 import uploadMultipleFiles from "../../utils/uploadMultipleFiles.ts";
 import { account, functions } from "../../utils/appwrite.ts";
 import { ExecutionMethod } from "appwrite";
+import MessageObject from "../../utils/interfaces/MessageObject.ts";
 
 interface TextareaProps {
   className?: string;
   room: RoomObject;
+  addOptimisticMessage: (message: MessageObject) => void;
 }
 
-export const Textarea = ({ className, room }: TextareaProps) => {
+export const Textarea = ({
+  className,
+  room,
+  addOptimisticMessage,
+}: TextareaProps) => {
   const [text, setText] = useState<string>("");
   const [attachments, setAttachments] = useState<File[]>([]);
   const [submitting, setSubmitting] = useState<boolean>(false);
   const { user } = useUserContext();
+  const formRef = useRef<HTMLFormElement>();
+  const [message, messageAction] = useActionState(handleSubmit, null);
 
   useEffect(() => {
     const keyDownHandler = (event: {
@@ -38,7 +53,8 @@ export const Textarea = ({ className, room }: TextareaProps) => {
         event.preventDefault();
         const attachmentsToSend = attachments || [];
         if (!text && attachmentsToSend.length < 1) return null;
-        handleSubmit(text, attachmentsToSend);
+        // handleSubmit(text, attachmentsToSend);
+        // Submit form
       }
     };
 
@@ -47,101 +63,117 @@ export const Textarea = ({ className, room }: TextareaProps) => {
     return () => document.removeEventListener("keydown", keyDownHandler);
   }, [text, attachments]);
 
-  const handleSubmit = useCallback(
-    async (message: string = "", attachmentsToSend: File[] = []) => {
-      setSubmitting(true);
-      setText("");
-      setAttachments([]);
-      if (submitting) return;
+  const submitAction = async (
+    message: string = "",
+    attachmentsToSend: File[] = [],
+  ) => {
+    setSubmitting(true);
+    setText("");
+    setAttachments([]);
 
-      const jwt = await account.createJWT();
+    if (submitting) return;
 
-      if (!user) return null;
-      if (!message && attachmentsToSend.length < 1) return null;
+    const jwt = await account.createJWT();
 
-      /*
-            Upload all the attachments.
-        */
+    if (!message && attachmentsToSend.length < 1) return null;
 
-      let attachmentIds: string[] = [];
-      if (attachmentsToSend.length > 0) {
-        attachmentIds = await uploadMultipleFiles(attachmentsToSend);
-      }
-      console.log({
+    /*
+              Upload all the attachments.
+          */
+
+    let attachmentIds: string[] = [];
+    if (attachmentsToSend.length > 0) {
+      attachmentIds = await uploadMultipleFiles(attachmentsToSend);
+    }
+    console.log({
+      jwt: jwt.jwt,
+      message: message,
+      attachments: attachmentIds,
+      roomId: room.$id,
+    });
+
+    const result = await functions.createExecution(
+      "sendMessage",
+      JSON.stringify({
         jwt: jwt.jwt,
         message: message,
         attachments: attachmentIds,
         roomId: room.$id,
-      });
+      }),
+      false,
+      undefined,
+      ExecutionMethod.POST,
+    );
 
-      const result = await functions.createExecution(
-        "sendMessage",
-        JSON.stringify({
-          jwt: jwt.jwt,
-          message: message,
-          attachments: attachmentIds,
-          roomId: room.$id,
-        }),
-        false,
-        undefined,
-        ExecutionMethod.POST,
-      );
-      const response = JSON.parse(result.responseBody);
-      if (!response.success)
-        return "There was an error while sending the message...";
+    const response = JSON.parse(result.responseBody);
+    if (!response) return "There was an error while sending the message...";
+    setSubmitting(false);
 
-      console.log(response);
-    },
-    [room, submitting],
-  );
+    console.log(response);
+  };
 
-  const updateAttachments = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const currentAttachmentsLength = attachments?.length || 0;
-      if (currentAttachmentsLength > 5) return;
+  const handleSubmit = async (
+    message: string = "",
+    attachmentsToSend: File[] = [],
+  ) => {
+    if (!user) return null;
 
-      const uploadedFiles: File[] = Array.from(e.target.files || []);
-      if (!uploadedFiles) return;
+    addOptimisticMessage({
+      $id: "OPT_MESSAGE_" + Math.floor(Math.random() * 10000).toString(),
+      $createdAt: new Date().toLocaleDateString(),
+      $updatedAt: new Date().toLocaleDateString(),
+      $permissions: [],
+      author: user,
+      room: room,
+      message: message,
+      attachments: [],
+      $databaseId: "TEMPORARY",
+      $collectionId: "TEMPORARY",
+    });
 
-      const uploadedFilesLength = uploadedFiles.length;
-      if (currentAttachmentsLength + uploadedFilesLength > 5) return;
+    submitAction(message, attachmentsToSend);
+  };
 
-      setAttachments((prevAttachments: File[]) => [
-        ...prevAttachments,
-        ...uploadedFiles,
-      ]);
-    },
-    [attachments],
-  );
+  const updateAttachments = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const currentAttachmentsLength = attachments?.length || 0;
+    if (currentAttachmentsLength > 5) return;
 
-  const removeAttachment = useCallback(
-    (index: number) => {
-      const newAttachments = [...attachments];
-      newAttachments.splice(index, 1);
-      setAttachments(newAttachments);
-    },
-    [attachments],
-  );
+    const uploadedFiles: File[] = Array.from(e.target.files || []);
+    if (!uploadedFiles) return;
 
-  const handlePaste = useCallback(
-    async (event: React.ClipboardEvent<HTMLTextAreaElement>) => {
-      const items = event.clipboardData.items;
-      for (const item of items) {
-        if (item.type.indexOf("image") === 0) {
-          event.preventDefault();
-          const file = item.getAsFile();
-          if (file) {
-            setAttachments((prevAttachments: File[]) => [
-              ...prevAttachments,
-              file,
-            ]);
-          }
-          return;
+    const uploadedFilesLength = uploadedFiles.length;
+    if (currentAttachmentsLength + uploadedFilesLength > 5) return;
+
+    setAttachments((prevAttachments: File[]) => [
+      ...prevAttachments,
+      ...uploadedFiles,
+    ]);
+  };
+
+  const removeAttachment = (index: number) => {
+    const newAttachments = [...attachments];
+    newAttachments.splice(index, 1);
+    setAttachments(newAttachments);
+  };
+
+  const handlePaste = async (
+    event: React.ClipboardEvent<HTMLTextAreaElement>,
+  ) => {
+    const items = event.clipboardData.items;
+    for (const item of items) {
+      if (item.type.indexOf("image") === 0) {
+        event.preventDefault();
+        const file = item.getAsFile();
+        if (file) {
+          setAttachments((prevAttachments: File[]) => [
+            ...prevAttachments,
+            file,
+          ]);
         }
+        return;
       }
-    },
-    [],
-  );
+    }
+  };
 
   const { getRootProps, getInputProps } = useDropzone({
     noClick: true,
@@ -159,6 +191,7 @@ export const Textarea = ({ className, room }: TextareaProps) => {
       }
       {...getRootProps()}
     >
+      {message}
       <ul
         className={
           "flex flex-row gap-4 overflow-x-scroll max-w-screen no-scrollbar"
@@ -218,7 +251,8 @@ export const Textarea = ({ className, room }: TextareaProps) => {
       </ul>
       <form
         className={"w-full flex justify-between"}
-        onSubmit={(e) => e.preventDefault()}
+        onSubmit={messageAction}
+        ref={formRef}
       >
         <div className={"flex justify-center items-center"}>
           <label>

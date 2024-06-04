@@ -1,6 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { FullscreenLoading } from "../components/FullscreenLoading.tsx";
-import { useEffect, useState } from "react";
+// @ts-ignore
+import { useEffect, useState, useOptimistic } from "react";
 import RoomObject from "../utils/interfaces/RoomObject.ts";
 import { useRoomsContext } from "../utils/RoomsContext.tsx";
 import Avatar from "../components/Avatar.tsx";
@@ -8,18 +9,50 @@ import { MdCall } from "react-icons/md";
 import { FaUsers } from "react-icons/fa6";
 import { IoMdExit } from "react-icons/io";
 import { Textarea } from "../components/Room/TextArea.tsx";
+import MessageObject from "../utils/interfaces/MessageObject.ts";
+import { Message } from "../components/Room/Message.tsx";
+import { client, database } from "../utils/appwrite.ts";
 
 export const Room = () => {
   const navigate = useNavigate();
   const { roomId } = useParams();
   const [room, setRoom] = useState<null | RoomObject>(null);
   const { rooms } = useRoomsContext();
+  const [messages, setMessages] = useState<MessageObject[]>([]);
+
+  const [optimisticMessages, addOptimisticMessage] = useOptimistic(
+    messages,
+    (currentState: MessageObject[], newMessage: MessageObject) => [
+      ...currentState,
+      newMessage,
+    ],
+  );
 
   useEffect(() => {
     if (roomId && rooms && rooms[roomId]) {
       setRoom(rooms[roomId]);
+      setMessages(rooms[roomId].messages);
     }
   }, [rooms, roomId]);
+
+  useEffect(() => {
+    if (room && room.$id) {
+      const unsubscribeMessages = client.subscribe(
+        `databases.${database}.collections.messages.documents`,
+        (response) => {
+          const payload = response.payload as MessageObject;
+          const messageRoomId = payload.room.$id;
+          console.log(payload);
+          if (messageRoomId === room.$id)
+            setMessages((prevMessages) => [payload, ...prevMessages]);
+        },
+      );
+
+      return () => {
+        unsubscribeMessages();
+      };
+    }
+  }, [room?.$id]);
 
   if (!roomId) {
     navigate("/");
@@ -57,9 +90,20 @@ export const Room = () => {
         </div>
       </nav>
       <section className={"flex flex-col col-span-12 row-span-11"}>
-        <section className={"bg-base-200 overflow-y-auto h-full"}></section>
+        <section
+          className={
+            "bg-base-200 overflow-y-auto h-full flex flex-col-reverse w-full p-4"
+          }
+        >
+          {console.log("OPTIMISTIC MESSAGES:", optimisticMessages)}
+          {optimisticMessages.map((message: MessageObject) => (
+            <Message key={message.$id + "_om"} message={message} />
+          ))}
+          <div>a</div>
+          <div>b</div>
+        </section>
         <footer className={"w-full p-2"}>
-          <Textarea room={room} />
+          <Textarea room={room} addOptimisticMessage={addOptimisticMessage} />
         </footer>
       </section>
     </section>
