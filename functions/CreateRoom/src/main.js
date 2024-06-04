@@ -97,9 +97,13 @@ export default async ({ req, res }) => {
         ],
       }
 
-      console.log(account);
-      console.log(account.rooms);
-      const newRooms = account.rooms ? [...account.rooms, newRoom] : [newRoom]
+      const oldUser = await database.getDocument(
+          "nexly",
+          "users",
+          account.$id
+      )
+
+      const newRooms = oldUser?.rooms ? [...oldUser.rooms, newRoom] : [newRoom]
 
       const newUser = await database.updateDocument(
         "nexly",
