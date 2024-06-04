@@ -6,6 +6,7 @@ import {
   ID,
   Account,
 } from "node-appwrite";
+import { log } from "node:util";
 
 export default async ({ req, res }) => {
   const client = new Client()
