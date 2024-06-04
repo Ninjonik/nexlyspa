@@ -55,6 +55,8 @@ export const Homepage = () => {
         ExecutionMethod.POST,
       );
       const response = JSON.parse(result.responseBody);
+      console.log(result);
+      console.log(response);
       if (!response.success || !response.status)
         return handleReturn("Room with the specified code does not exist.");
     }

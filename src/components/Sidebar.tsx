@@ -26,11 +26,11 @@ export const Sidebar = () => {
           ))}
         </section>
         <section className={"flex p-2 border-t-2 border-primary"}>
-          <div className={"flex flex-row w-full gap-4 p-2 justify-between"}>
+          <div className={"flex flex-row w-full gap-4 p-2"}>
             <div className={"flex flex-row gap-4"}>
               <Avatar />
-              <div className={"flex flex-col text-start justify-center"}>
-                <h3 className={"text-primary font-bold"}>{user.name}</h3>
+              <div className={"flex flex-col text-start justify-center overflow-hidden"}>
+                <h3 className={"text-primary font-bold max-w-24"}>{user.name}</h3>
                 <h4>{user.emailVerification ? "Verified" : "Not verified"}</h4>
               </div>
             </div>

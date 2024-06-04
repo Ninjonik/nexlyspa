@@ -1,7 +1,5 @@
-import { Client, Databases, Account, Permission, Role } from "node-appwrite";
+import { Client, Databases, Account, Permission, Role, ExecutionMethod, Functions } from "node-appwrite";
 import { generate } from "random-words";
-import { functions } from "../../../src/utils/appwrite.js";
-import { ExecutionMethod } from "appwrite";
 
 const generateUniqueRoomCode = async () => {
   let generatedCode = "";
@@ -41,6 +39,7 @@ export default async ({ req, res }) => {
     .setKey(process.env.APPWRITE_KEY);
 
   const database = new Databases(client);
+  const functions = new Functions(client);
 
   const jwtClient = new Client()
     .setEndpoint(process.env.APPWRITE_ENDPOINT)
