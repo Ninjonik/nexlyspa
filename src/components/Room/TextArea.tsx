@@ -13,6 +13,9 @@ import { useDropzone } from "react-dropzone";
 import { useUserContext } from "../../utils/UserContext.tsx";
 import RoomObject from "../../utils/interfaces/RoomObject.ts";
 import Tippy from "@tippyjs/react";
+import uploadMultipleFiles from "../../utils/uploadMultipleFiles.ts";
+import { account, functions } from "../../utils/appwrite.ts";
+import { ExecutionMethod } from "appwrite";
 
 interface TextareaProps {
   className?: string;
@@ -25,38 +28,6 @@ export const Textarea = ({ className, room }: TextareaProps) => {
   const [submitting, setSubmitting] = useState<boolean>(false);
   const { user } = useUserContext();
 
-  // useEffect(() => {
-  //     const delayDebounceFn = setTimeout(() => {
-  //         /* Perform emoji formatting etc. */
-  //     }, 1000)
-  //
-  //
-  //
-  //
-  //     return () => clearTimeout(delayDebounceFn)
-  //
-  // }, [text]);
-
-  // TODO: make this more optimized by not running the functions always on keydown, add a debounce
-  useEffect(() => {
-    const keyDownHandler = (event: {
-      key: string;
-      shiftKey: boolean;
-      preventDefault: () => void;
-    }) => {
-      if (event.key === "Enter" && !event.shiftKey) {
-        event.preventDefault();
-        const attachmentsToSend = attachments || [];
-        if (!text && attachmentsToSend.length < 1) return null;
-        handleSubmit(text, attachmentsToSend);
-      }
-    };
-
-    document.addEventListener("keydown", keyDownHandler);
-
-    return () => document.removeEventListener("keydown", keyDownHandler);
-  }, [text, attachments]);
-
   const handleSubmit = useCallback(
     async (message: string = "", attachmentsToSend: File[] = []) => {
       setSubmitting(true);
@@ -64,7 +35,7 @@ export const Textarea = ({ className, room }: TextareaProps) => {
       setAttachments([]);
       if (submitting) return;
 
-      // const jwt = await account.createJWT();
+      const jwt = await account.createJWT();
 
       if (!user) return null;
       if (!message && attachmentsToSend.length < 1) return null;
@@ -73,29 +44,34 @@ export const Textarea = ({ className, room }: TextareaProps) => {
             Upload all the attachments.
         */
 
-      // let attachmentIds: string[] = [];
-      // if(attachmentsToSend.length > 0){
-      //     attachmentIds = await uploadMultipleFiles(attachmentsToSend);
-      // }
+      let attachmentIds: string[] = [];
+      if (attachmentsToSend.length > 0) {
+        attachmentIds = await uploadMultipleFiles(attachmentsToSend);
+      }
+      console.log({
+        jwt: jwt.jwt,
+        message: message,
+        attachments: attachmentIds,
+        roomId: room.$id,
+      });
 
-      // const res = await fetch(
-      //     process.env.NEXT_PUBLIC_HOSTNAME + `/api/sendMessage`,
-      //     {
-      //         method: "POST",
-      //         headers: {
-      //             "Content-Type": "application/json",
-      //         },
-      //         body: JSON.stringify({
-      //             "jwt": jwt.jwt,
-      //             "message": message,
-      //             "attachments": attachmentIds,
-      //             "roomId": room.$id
-      //         }),
-      //     }
-      // )
-      // const resJson = await res.json();
-      // setSubmitting(false);
-      // console.log(resJson);
+      const result = await functions.createExecution(
+        "sendMessage",
+        JSON.stringify({
+          jwt: jwt.jwt,
+          message: message,
+          attachments: attachmentIds,
+          roomId: room.$id,
+        }),
+        false,
+        undefined,
+        ExecutionMethod.POST,
+      );
+      const response = JSON.parse(result.responseBody);
+      if (!response.success)
+        return "There was an error while sending the message...";
+
+      console.log(response);
     },
     [room, submitting],
   );
