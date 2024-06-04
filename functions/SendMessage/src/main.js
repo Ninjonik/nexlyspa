@@ -72,24 +72,24 @@ export default async ({ req, res }) => {
         if (user.$id === account.$id) userInRoom = true;
       });
 
-      if (!userInRoom)
-        return res.json({
-          success: false,
-          message: "User is not in the room.",
-        });
+      // if (!userInRoom)
+      //   return res.json({
+      //     success: false,
+      //     message: "User is not in the room.",
+      //   });
 
-      const result = await jwtDatabases.createDocument(
-        database,
-        "messages",
-        ID.unique(),
-        {
-          room: roomId,
-          author: account.$id,
-          message: message,
-          attachments: attachments,
-        },
-        permissions,
-      );
+      // const result = await jwtDatabases.createDocument(
+      //   database,
+      //   "messages",
+      //   ID.unique(),
+      //   {
+      //     room: roomId,
+      //     author: account.$id,
+      //     message: message,
+      //     attachments: attachments,
+      //   },
+      //   permissions,
+      // );
 
       console.log("RESULT:", result);
 
