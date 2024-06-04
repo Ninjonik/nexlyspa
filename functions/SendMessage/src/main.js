@@ -6,7 +6,6 @@ import {
   ID,
   Account,
 } from "node-appwrite";
-import { log } from "node:util";
 
 export default async ({ req, res }) => {
   const client = new Client()
@@ -24,14 +23,11 @@ export default async ({ req, res }) => {
   const jwtAccount = new Account(jwtClient);
 
   if (req.method === "POST") {
-    log(req.body);
     const body = JSON.parse(req.body);
-    log(body);
     const jwt = body?.jwt;
     const message = body?.message;
     const attachments = body?.attachments;
     const roomId = body?.roomId;
-    log("a");
     if (!roomId || !jwt || (!message && !attachments && attachments.length < 1))
       return res.json({
         success: false,
@@ -39,7 +35,7 @@ export default async ({ req, res }) => {
       });
 
     let account;
-    log("b");
+
     try {
       jwtClient.setJWT(jwt);
       account = await jwtAccount.get();
@@ -55,7 +51,7 @@ export default async ({ req, res }) => {
         message: "Invalid JWT Token",
       });
     }
-    log("c");
+
     try {
       const roomData = await jwtDatabases.getDocument(
         database,
@@ -68,7 +64,7 @@ export default async ({ req, res }) => {
           success: false,
           message: "Specified room does not exist / user is not in the room.",
         });
-      log("d");
+
       let permissions = [];
       let userInRoom = false;
       roomData.users.map((user) => {
@@ -81,7 +77,7 @@ export default async ({ req, res }) => {
           success: false,
           message: "User is not in the room.",
         });
-      log("e");
+
       const result = await jwtDatabases.createDocument(
         database,
         "messages",
@@ -95,13 +91,13 @@ export default async ({ req, res }) => {
         permissions,
       );
 
-      log("RESULT:", result);
-      log("f");
-      return res.json({
-        success: false,
-        message: "Message successfully sent!",
-        data: result,
-      });
+      console.log("RESULT:", result);
+
+      // return res.json({
+      //   success: false,
+      //   message: "Message successfully sent!",
+      //   data: result,
+      // });
     } catch (error) {
       console.error("Error creating a message:", error);
       return Response.json(
