@@ -1,11 +1,4 @@
-// @ts-ignore
-import React, {
-  useEffect,
-  useState,
-  useActionState,
-  useRef,
-  MutableRefObject,
-} from "react";
+import React, { useEffect, useState } from "react";
 import { FaPlus } from "react-icons/fa";
 import {
   AiOutlineDelete,
@@ -40,8 +33,6 @@ export const Textarea = ({
   const [attachments, setAttachments] = useState<File[]>([]);
   const [submitting, setSubmitting] = useState<boolean>(false);
   const { user } = useUserContext();
-  const formRef = useRef<HTMLFormElement>();
-  const [message, messageAction] = useActionState(handleSubmit, null);
 
   useEffect(() => {
     const keyDownHandler = (event: {
@@ -53,8 +44,7 @@ export const Textarea = ({
         event.preventDefault();
         const attachmentsToSend = attachments || [];
         if (!text && attachmentsToSend.length < 1) return null;
-        // handleSubmit(text, attachmentsToSend);
-        // Submit form
+        handleSubmit(text, attachmentsToSend);
       }
     };
 
@@ -118,18 +108,18 @@ export const Textarea = ({
   ) => {
     if (!user) return null;
 
-    addOptimisticMessage({
-      $id: "OPT_MESSAGE_" + Math.floor(Math.random() * 10000).toString(),
-      $createdAt: new Date().toLocaleDateString(),
-      $updatedAt: new Date().toLocaleDateString(),
-      $permissions: [],
-      author: user,
-      room: room,
-      message: message,
-      attachments: [],
-      $databaseId: "TEMPORARY",
-      $collectionId: "TEMPORARY",
-    });
+    // addOptimisticMessage({
+    //   $id: "OPT_MESSAGE_" + Math.floor(Math.random() * 10000).toString(),
+    //   $createdAt: new Date().toLocaleDateString(),
+    //   $updatedAt: new Date().toLocaleDateString(),
+    //   $permissions: [],
+    //   author: user,
+    //   room: room,
+    //   message: message,
+    //   attachments: [],
+    //   $databaseId: "TEMPORARY",
+    //   $collectionId: "TEMPORARY",
+    // });
 
     submitAction(message, attachmentsToSend);
   };
@@ -191,7 +181,6 @@ export const Textarea = ({
       }
       {...getRootProps()}
     >
-      {message}
       <ul
         className={
           "flex flex-row gap-4 overflow-x-scroll max-w-screen no-scrollbar"
@@ -251,8 +240,7 @@ export const Textarea = ({
       </ul>
       <form
         className={"w-full flex justify-between"}
-        onSubmit={messageAction}
-        ref={formRef}
+        onSubmit={(e) => e.preventDefault()}
       >
         <div className={"flex justify-center items-center"}>
           <label>

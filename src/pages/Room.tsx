@@ -95,8 +95,7 @@ export const Room = () => {
             "bg-base-200 overflow-y-auto h-full flex flex-col-reverse w-full p-4"
           }
         >
-          {console.log("OPTIMISTIC MESSAGES:", optimisticMessages)}
-          {optimisticMessages.map((message: MessageObject) => (
+          {messages.map((message: MessageObject) => (
             <Message key={message.$id + "_om"} message={message} />
           ))}
           <div>a</div>
