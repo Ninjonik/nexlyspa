@@ -2,9 +2,13 @@
 import { useActionState, useState } from "react";
 import { account, functions } from "../utils/appwrite.ts";
 import { ExecutionMethod } from "appwrite";
+import { useUserContext } from "../utils/UserContext.tsx";
+import { useNavigate } from "react-router-dom";
 
 export const Homepage = () => {
   const [pending, setPending] = useState<boolean>(false);
+  const { setUser } = useUserContext();
+  const navigate = useNavigate();
 
   const handleRoomSubmit = async (_prevState: null, queryData: FormData) => {
     setPending(true);
@@ -55,10 +59,11 @@ export const Homepage = () => {
         ExecutionMethod.POST,
       );
       const response = JSON.parse(result.responseBody);
-      console.log(result);
-      console.log(response);
-      if (!response.success || !response.status)
+      if (!response.success)
         return handleReturn("Room with the specified code does not exist.");
+
+      setUser(response.newUser);
+      navigate("/room/" + response.generatedCode);
     }
 
     // Handle the common stuff
@@ -83,15 +88,15 @@ export const Homepage = () => {
             Join an existing room
           </h3>
           <form
-              action={formActionJoin}
-              className={"flex flex-col w-full gap-4 h-full justify-between"}
+            action={formActionJoin}
+            className={"flex flex-col w-full gap-4 h-full justify-between"}
           >
             <div className={"flex flex-col gap-8"}>
               <input
-                  type="text"
-                  placeholder="Room's code"
-                  name={"code"}
-                  required={true}
+                type="text"
+                placeholder="Room's code"
+                name={"code"}
+                required={true}
               />
             </div>
             <button type="submit" disabled={pending}>
@@ -103,23 +108,23 @@ export const Homepage = () => {
         <div className={"w-1/2 flex flex-col gap-2 h-full"}>
           <h3 className={"text-primary font-semibold"}>Create a new room</h3>
           <form
-              action={formActionCreate}
-              className={"flex flex-col w-full gap-4 h-full justify-between"}
+            action={formActionCreate}
+            className={"flex flex-col w-full gap-4 h-full justify-between"}
           >
             <div className={"flex flex-row gap-8"}>
               <input
-                  type="text"
-                  placeholder="New room's name"
-                  className={"w-1/2"}
-                  name={"name"}
-                  required={true}
+                type="text"
+                placeholder="New room's name"
+                className={"w-1/2"}
+                name={"name"}
+                required={true}
               />
               <input
-                  type="text"
-                  placeholder="New room's description"
-                  className={"w-1/2"}
-                  name={"description"}
-                  required={true}
+                type="text"
+                placeholder="New room's description"
+                className={"w-1/2"}
+                name={"description"}
+                required={true}
               />
             </div>
             <button type="submit" disabled={pending}>

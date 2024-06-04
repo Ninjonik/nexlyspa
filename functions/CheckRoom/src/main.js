@@ -35,7 +35,6 @@ export default async ({ req, res }) => {
     }
   }
 
-  console.log("Invalid Method")
   return res.json({
     success: false,
     message: "Invalid Method",

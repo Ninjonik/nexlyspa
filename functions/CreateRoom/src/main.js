@@ -1,4 +1,12 @@
-import { Client, Databases, Account, Permission, Role, Functions, ExecutionMethod } from "node-appwrite";
+import {
+  Client,
+  Databases,
+  Account,
+  Permission,
+  Role,
+  Functions,
+  ExecutionMethod,
+} from "node-appwrite";
 import { generate } from "random-words";
 
 const generateUniqueRoomCode = async (functions) => {
@@ -16,8 +24,8 @@ const generateUniqueRoomCode = async (functions) => {
         roomId: generatedCode,
       }),
       false,
-        undefined,
-        ExecutionMethod.GET,
+      undefined,
+      ExecutionMethod.GET,
     );
 
     const response = JSON.parse(result.responseBody);
@@ -45,7 +53,6 @@ export default async ({ req, res }) => {
     .setEndpoint(process.env.APPWRITE_ENDPOINT)
     .setProject(process.env.APPWRITE_PROJECT);
 
-  const jwtDatabases = new Databases(jwtClient);
   const jwtAccount = new Account(jwtClient);
 
   if (req.method === "POST") {
@@ -95,22 +102,18 @@ export default async ({ req, res }) => {
           Permission.delete(Role.user(account.$id)),
           Permission.read(Role.any()),
         ],
-      }
+      };
 
-      const oldUser = await database.getDocument(
-          "nexly",
-          "users",
-          account.$id
-      )
+      const oldUser = await database.getDocument("nexly", "users", account.$id);
 
-      const newRooms = oldUser?.rooms ? [...oldUser.rooms, newRoom] : [newRoom]
+      const newRooms = oldUser?.rooms ? [...oldUser.rooms, newRoom] : [newRoom];
 
       const newUser = await database.updateDocument(
         "nexly",
         "users",
         account.$id,
         {
-          rooms: newRooms
+          rooms: newRooms,
         },
       );
 
