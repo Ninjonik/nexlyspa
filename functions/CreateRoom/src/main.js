@@ -1,7 +1,7 @@
-import { Client, Databases, Account, Permission, Role, ExecutionMethod, Functions } from "node-appwrite";
+import { Client, Databases, Account, Permission, Role, Functions } from "node-appwrite";
 import { generate } from "random-words";
 
-const generateUniqueRoomCode = async () => {
+const generateUniqueRoomCode = async (functions) => {
   let generatedCode = "";
   let codeExists = true;
 
@@ -15,9 +15,7 @@ const generateUniqueRoomCode = async () => {
       JSON.stringify({
         roomId: generatedCode,
       }),
-      false,
-      undefined,
-      ExecutionMethod.GET,
+      false
     );
 
     const response = JSON.parse(result.responseBody);
@@ -80,7 +78,7 @@ export default async ({ req, res }) => {
     }
 
     try {
-      const generatedCode = await generateUniqueRoomCode();
+      const generatedCode = await generateUniqueRoomCode(functions);
 
       const newUser = await database.updateDocument(
         "nexly",
