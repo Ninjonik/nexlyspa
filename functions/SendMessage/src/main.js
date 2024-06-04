@@ -13,8 +13,6 @@ export default async ({ req, res }) => {
     .setProject(process.env.APPWRITE_PROJECT)
     .setKey(process.env.APPWRITE_KEY);
 
-  const database = new Databases(client);
-
   const jwtClient = new Client()
     .setEndpoint(process.env.APPWRITE_ENDPOINT)
     .setProject(process.env.APPWRITE_PROJECT);
@@ -53,11 +51,7 @@ export default async ({ req, res }) => {
     }
 
     try {
-      const roomData = await jwtDatabases.getDocument(
-        database,
-        "rooms",
-        roomId,
-      );
+      const roomData = await jwtDatabases.getDocument("nexly", "rooms", roomId);
 
       if (!roomData)
         return res.json({
@@ -79,7 +73,7 @@ export default async ({ req, res }) => {
         });
 
       const result = await jwtDatabases.createDocument(
-        database,
+        "nexly",
         "messages",
         ID.unique(),
         {
