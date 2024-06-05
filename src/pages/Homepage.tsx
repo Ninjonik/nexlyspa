@@ -39,7 +39,9 @@ export const Homepage = () => {
       );
       const response = JSON.parse(result.responseBody);
       if (!response.success || !response.status)
-        return handleReturn("Room with the specified code does not exist.");
+        return handleReturn("Room with the specified code does not exist or is currently closed.");
+
+
     } else {
       // Handle creating a room
       if (!name || !description)

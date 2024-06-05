@@ -17,7 +17,7 @@ export const Sidebar = () => {
   return (
     <aside
       className={
-        "w-full md:w-1/4 bg-base-100 h-full overflow-hidden flex flex-col justify-between"
+        "w-full md:w-1/4 bg-base-100 h-full overflow-hidden flex flex-col justify-between pt-4"
       }
     >
       <section
