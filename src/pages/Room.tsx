@@ -91,19 +91,17 @@ export const Room = () => {
       </nav>
       <section className={"flex flex-col col-span-12 row-span-11"}>
         <section
-          className={
-            "bg-base-200 overflow-y-auto h-full flex flex-col-reverse w-full p-4"
-          }
+            className={
+              "bg-base-200 overflow-y-auto h-full flex flex-col-reverse w-full p-4"
+            }
         >
+          <footer className={"w-full p-2"}>
+            <Textarea room={room} addOptimisticMessage={addOptimisticMessage}/>
+          </footer>
           {messages.map((message: MessageObject) => (
-            <Message key={message.$id + "_om"} message={message} />
+              <Message key={message.$id + "_om"} message={message}/>
           ))}
-          <div>a</div>
-          <div>b</div>
         </section>
-        <footer className={"w-full p-2"}>
-          <Textarea room={room} addOptimisticMessage={addOptimisticMessage} />
-        </footer>
       </section>
     </section>
   );

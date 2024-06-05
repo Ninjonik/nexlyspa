@@ -1,7 +1,7 @@
 import Avatar from "./Avatar.tsx";
 import { Link } from "react-router-dom";
-import { FaGear, FaMicrophone } from "react-icons/fa6";
-import { TbHeadphonesOff, TbLogout2, TbMessages } from "react-icons/tb";
+import { FaGear } from "react-icons/fa6";
+import { TbLogout2, TbMessages } from "react-icons/tb";
 import { IoMdCheckmarkCircle } from "react-icons/io";
 import { useUserContext } from "../utils/UserContext.tsx";
 import { FullscreenLoading } from "./FullscreenLoading.tsx";
@@ -37,7 +37,7 @@ export const Sidebar = () => {
       </section>
       <section className={"flex flex-row p-2 h-24"}>
         <div className={"flex flex-row w-full gap-4 justify-between"}>
-          <div className={"flex flex-row gap-4 w-1/3"}>
+          <div className={"flex flex-row gap-4 w-2/3"}>
             <Avatar />
             <div
               className={
@@ -48,21 +48,7 @@ export const Sidebar = () => {
               <h4>{user.emailVerification ? "Verified" : "Not verified"}</h4>
             </div>
           </div>
-          <div className={"flex flex-row gap-4 justify-end items-center w-2/3"}>
-            <Link
-              to={"/logout"}
-              className={"font-bold text-xl"}
-              title={"Toggle microphone"}
-            >
-              <FaMicrophone />
-            </Link>
-            <Link
-              to={"/logout"}
-              className={"font-bold text-xl"}
-              title={"Toggle headphones"}
-            >
-              <TbHeadphonesOff />
-            </Link>
+          <div className={"flex flex-row gap-4 justify-end items-center w-1/3"}>
             <Link
               to={"/register/verify"}
               className={"font-bold text-xl"}

@@ -183,7 +183,7 @@ export const Textarea = ({
     >
       <ul
         className={
-          "flex flex-row gap-4 overflow-x-scroll max-w-screen no-scrollbar"
+          "flex flex-row gap-4 overflow-x-scroll h-0 max-w-48 max-w-screen no-scrollbar"
         }
       >
         {attachments?.map((attachment: File, index) => {
@@ -196,7 +196,7 @@ export const Textarea = ({
           return (
             <li
               className={
-                "bg-base-300 border-primary border rounded-xl p-2 h-48 w-48 flex flex-col justify-between items-center relative"
+                "bg-base-300 border-primary border rounded-xl h-48 w-48 flex flex-col justify-between items-center relative"
               }
               key={"attachment" + index}
             >
@@ -239,10 +239,9 @@ export const Textarea = ({
         })}
       </ul>
       <form
-        className={"w-full flex justify-between"}
+        className={"w-full flex justify-between items-center"}
         onSubmit={(e) => e.preventDefault()}
       >
-        <div className={"flex justify-center items-center"}>
           <label>
             <input
               type="file"
@@ -257,17 +256,14 @@ export const Textarea = ({
               <FaPlus />
             </a>
           </label>
-        </div>
-        <div className={"w-full flex items-center"}>
-          <TextareaAutosize
-            className={`textarea focus:outline-none focus:border-none w-full h-full ${className} p-2 resize-none bg-base-300 max-h-96 overflow-y-scroll no-scrollbar flex items-center`}
-            cacheMeasurements
-            value={text}
-            rows={1}
-            onPaste={handlePaste}
-            onChange={(e) => setText(e.target.value)}
-          />
-        </div>
+        <TextareaAutosize
+          className={`textarea focus:outline-none focus:border-none w-full h-full ${className} resize-none bg-base-300 max-h-96 overflow-y-auto no-scrollbar flex items-center`}
+          cacheMeasurements
+          value={text}
+          rows={1}
+          onPaste={handlePaste}
+          onChange={(e) => setText(e.target.value)}
+        />
         <div className={"flex justify-center items-center"}>
           <Tippy
             content={

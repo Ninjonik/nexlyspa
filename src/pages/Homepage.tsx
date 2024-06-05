@@ -33,19 +33,17 @@ export const Homepage = () => {
       const result = await functions.createExecution(
         "joinRoom",
         JSON.stringify({
-          jwt: jwt,
-          roomId: code,
+          jwt: jwt.jwt,
+          roomCode: code,
         }),
         false,
         undefined,
-        ExecutionMethod.GET,
+        ExecutionMethod.POST,
       );
       response = JSON.parse(result.responseBody);
+      console.log(result, response);
       if (!response.success || !response.status)
-        return handleReturn("Room with the specified code does not exist or is currently closed.");
-
-
-
+        return handleReturn(response?.message ?? "An unknown error has happened.");
 
     } else {
       // Handle creating a room

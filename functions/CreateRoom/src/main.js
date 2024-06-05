@@ -106,7 +106,7 @@ export default async ({ req, res }) => {
 
       const oldUser = await database.getDocument("nexly", "users", account.$id);
 
-      const newRooms = oldUser?.rooms ? [...oldUser.rooms, newRoom] : [newRoom];
+      const newRooms = (oldUser?.rooms && oldUser.rooms.length > 0) ? [...oldUser.rooms, newRoom] : [newRoom];
 
       const newUser = await database.updateDocument(
         "nexly",

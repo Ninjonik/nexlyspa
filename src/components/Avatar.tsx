@@ -7,7 +7,7 @@ interface AvatarProps {
 const Avatar = ({ avatarId = "defaultAvatar" }: AvatarProps) => {
   return (
     <div className="avatar">
-      <div className="h-16 w-16 rounded-full">
+      <div className="h-14 w-14 rounded-full">
         <img src={getAvatar(avatarId)} />
       </div>
     </div>

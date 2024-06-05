@@ -3,7 +3,7 @@ import {
   Databases,
   Account,
   Functions,
-  ExecutionMethod,
+  ExecutionMethod, Permission, Role,
 } from "node-appwrite";
 
 export default async ({ req, res }) => {
@@ -69,24 +69,29 @@ export default async ({ req, res }) => {
         });
       }
 
-      const oldUser = await database.getDocument("nexly", "users", account.$id);
+      const roomData = await database.getDocument("nexly", "rooms", roomCode);
 
-      const newRooms = oldUser?.rooms ? [...oldUser.rooms, roomCode] : [roomCode];
+      const newRoomUsers = roomData?.users ? [...roomData.users, account.$id] : [account.$id];
+      const userPermissions = [
+        Permission.read(Role.user(account.$id))
+      ];
+      const newRoomPermissions = (roomData?.$permissions && roomData?.$permissions.length > 0) ? [...roomData.$permissions, ...userPermissions] : userPermissions;
 
-      const newUser = await database.updateDocument(
+      const newRoom = await database.updateDocument(
         "nexly",
         "users",
-        account.$id,
+        roomCode,
         {
-          rooms: newRooms,
+          users: newRoomUsers,
         },
+        newRoomPermissions
       );
 
-      if (newUser) {
+      if (newRoom) {
         return res.json({
           success: true,
           message: "Successfully joined a new room!",
-          newUser: newUser,
+          newRoom: newRoom,
           roomCode: roomCode
         });
       }
