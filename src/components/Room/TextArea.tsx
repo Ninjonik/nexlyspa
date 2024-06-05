@@ -257,7 +257,7 @@ export const Textarea = ({
             </a>
           </label>
         <TextareaAutosize
-          className={`textarea focus:outline-none focus:border-none w-full h-full ${className} resize-none bg-base-300 max-h-96 overflow-y-auto no-scrollbar flex items-center`}
+          className={`p-2 focus:outline-none focus:border-none w-full h-full ${className} resize-none bg-base-300 max-h-96 overflow-y-auto no-scrollbar flex items-center`}
           cacheMeasurements
           value={text}
           rows={1}

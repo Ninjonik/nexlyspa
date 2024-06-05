@@ -79,7 +79,7 @@ export default async ({ req, res }) => {
 
       const newRoom = await database.updateDocument(
         "nexly",
-        "users",
+        "rooms",
         roomCode,
         {
           users: newRoomUsers,
@@ -103,7 +103,7 @@ export default async ({ req, res }) => {
       console.log(err);
       return res.json({
         success: true,
-        message: "Cannot create a room with specified arguments...",
+        message: "Cannot join the room with the specified arguments...",
       });
     }
   }
