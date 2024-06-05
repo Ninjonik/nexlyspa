@@ -87,6 +87,7 @@ export default async ({ req, res }) => {
           success: true,
           message: "Successfully joined a new room!",
           newUser: newUser,
+          roomCode: roomCode
         });
       }
       return res.json({

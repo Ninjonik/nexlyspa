@@ -122,7 +122,7 @@ export default async ({ req, res }) => {
           success: true,
           message: "Successfully created a new room!",
           newUser: newUser,
-          generatedCode: generatedCode,
+          roomCode: generatedCode,
         });
       }
       return res.json({

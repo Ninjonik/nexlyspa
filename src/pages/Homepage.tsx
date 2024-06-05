@@ -22,6 +22,8 @@ export const Homepage = () => {
     };
 
     // Handle the common stuff
+    const jwt = await account.createJWT();
+    let response;
 
     if (code) {
       // Handle joining a room
@@ -29,17 +31,20 @@ export const Homepage = () => {
 
       // Validate room's code
       const result = await functions.createExecution(
-        "checkRoom",
+        "joinRoom",
         JSON.stringify({
+          jwt: jwt,
           roomId: code,
         }),
         false,
         undefined,
         ExecutionMethod.GET,
       );
-      const response = JSON.parse(result.responseBody);
+      response = JSON.parse(result.responseBody);
       if (!response.success || !response.status)
         return handleReturn("Room with the specified code does not exist or is currently closed.");
+
+
 
 
     } else {
@@ -47,7 +52,6 @@ export const Homepage = () => {
       if (!name || !description)
         return handleReturn("Please fill all the fields.");
 
-      const jwt = await account.createJWT();
       const result = await functions.createExecution(
         "createRoom",
         JSON.stringify({
@@ -60,15 +64,14 @@ export const Homepage = () => {
         undefined,
         ExecutionMethod.POST,
       );
-      const response = JSON.parse(result.responseBody);
+      response = JSON.parse(result.responseBody);
       if (!response.success)
         return handleReturn("Room with the specified code does not exist.");
-
-      setUser(response.newUser);
-      navigate("/room/" + response.generatedCode);
     }
 
     // Handle the common stuff
+    setUser(response.newUser);
+    navigate("/room/" + response.roomCode);
   };
 
   const [messageJoin, formActionJoin] = useActionState(handleRoomSubmit, null);
