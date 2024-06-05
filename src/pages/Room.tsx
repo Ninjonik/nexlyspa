@@ -1,7 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { FullscreenLoading } from "../components/FullscreenLoading.tsx";
-// @ts-expect-error erroneous due to outdated react types, will be fixed with react 19
-import { useEffect, useState, useOptimistic } from "react";
+import { useEffect, useRef, useState } from "react";
 import RoomObject from "../utils/interfaces/RoomObject.ts";
 import { useRoomsContext } from "../utils/RoomsContext.tsx";
 import Avatar from "../components/Avatar.tsx";
@@ -12,21 +11,19 @@ import { Textarea } from "../components/Room/TextArea.tsx";
 import MessageObject from "../utils/interfaces/MessageObject.ts";
 import { Message } from "../components/Room/Message.tsx";
 import { client, database } from "../utils/appwrite.ts";
+import { useUserContext } from "../utils/UserContext.tsx";
 
 export const Room = () => {
   const navigate = useNavigate();
+  const { user } = useUserContext();
   const { roomId } = useParams();
   const [room, setRoom] = useState<null | RoomObject>(null);
   const { rooms } = useRoomsContext();
   const [messages, setMessages] = useState<MessageObject[]>([]);
-
-  const [optimisticMessages, addOptimisticMessage] = useOptimistic(
-    messages,
-    (currentState: MessageObject[], newMessage: MessageObject) => [
-      newMessage,
-      ...currentState,
-    ],
+  const [optimisticMessages, setOptimisticMessages] = useState<MessageObject[]>(
+    [],
   );
+  const optimisticMessagesRef = useRef<MessageObject[]>([]);
 
   useEffect(() => {
     if (roomId && rooms && rooms[roomId]) {
@@ -43,8 +40,16 @@ export const Room = () => {
           const payload = response.payload as MessageObject;
           const messageRoomId = payload.room.$id;
           console.log(payload);
-          if (messageRoomId === room.$id)
-            setMessages((prevMessages) => [payload, ...prevMessages]);
+          if (messageRoomId === room.$id && user)
+            if (
+              payload.author.$id === user.$id &&
+              optimisticMessagesRef.current.length > 0
+            ) {
+              const newOptimisticMessages = [...optimisticMessagesRef.current];
+              newOptimisticMessages.pop();
+              setOptimisticMessages(newOptimisticMessages);
+            }
+          setMessages((prevMessages) => [payload, ...prevMessages]);
         },
       );
 
@@ -53,6 +58,10 @@ export const Room = () => {
       };
     }
   }, [room?.$id]);
+
+  useEffect(() => {
+    optimisticMessagesRef.current = optimisticMessages;
+  }, [optimisticMessages]);
 
   if (!roomId) {
     navigate("/");
@@ -96,9 +105,15 @@ export const Room = () => {
           }
         >
           <footer className={"w-full p-2"}>
-            <Textarea room={room} addOptimisticMessage={addOptimisticMessage} />
+            <Textarea
+              room={room}
+              setOptimisticMessages={setOptimisticMessages}
+            />
           </footer>
           {optimisticMessages.map((message: MessageObject) => (
+            <Message key={message.$id} message={message} />
+          ))}
+          {messages.map((message: MessageObject) => (
             <Message key={message.$id} message={message} />
           ))}
         </section>

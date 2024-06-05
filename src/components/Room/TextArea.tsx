@@ -3,8 +3,9 @@ import React, {
   useActionState,
   useEffect,
   useState,
-  startTransition,
   useRef,
+  SetStateAction,
+  Dispatch,
 } from "react";
 import { FaPlus } from "react-icons/fa";
 import {
@@ -28,19 +29,19 @@ import MessageObject from "../../utils/interfaces/MessageObject.ts";
 interface TextareaProps {
   className?: string;
   room: RoomObject;
-  addOptimisticMessage: (message: MessageObject) => void;
+  setOptimisticMessages: Dispatch<SetStateAction<MessageObject[]>>;
 }
 
 export const Textarea = ({
   className,
   room,
-  addOptimisticMessage,
+  setOptimisticMessages,
 }: TextareaProps) => {
   const [text, setText] = useState<string>("");
   const [attachments, setAttachments] = useState<File[]>([]);
-  const [submitting, setSubmitting] = useState<boolean>(false);
   const { user } = useUserContext();
   const formRef = useRef<HTMLFormElement>(null);
+  let i = 0;
 
   useEffect(() => {
     const keyDownHandler = (event: {
@@ -63,15 +64,12 @@ export const Textarea = ({
     message: string = "",
     attachmentsToSend: File[] = [],
   ) => {
-    setSubmitting(true);
     setText("");
     setAttachments([]);
 
-    if (submitting) return;
-
     const jwt = await account.createJWT();
 
-    if (!message && attachmentsToSend.length < 1) return null;
+    if (!message && attachmentsToSend.length < 1) return;
 
     /*
               Upload all the attachments.
@@ -102,8 +100,7 @@ export const Textarea = ({
     );
 
     const response = JSON.parse(result.responseBody);
-    if (!response) return "There was an error while sending the message...";
-    setSubmitting(false);
+    if (!response) return;
 
     console.log(response);
   };
@@ -111,22 +108,23 @@ export const Textarea = ({
   const handleSubmit = (_prevState: string, queryData: FormData) => {
     const message = queryData.get("message") as string;
     if (user && message) {
-      // @ts-expect-error will be fixed in react 19's new types
-      startTransition(async () => {
-        // addOptimisticMessage({
-        //   $id: "optimistic_message",
-        //   $createdAt: new Date().toLocaleDateString(),
-        //   $updatedAt: new Date().toLocaleDateString(),
-        //   $permissions: [],
-        //   author: user,
-        //   room: room,
-        //   message: message,
-        //   attachments: [],
-        //   $databaseId: "TEMPORARY",
-        //   $collectionId: "TEMPORARY",
-        // });
-        await submitAction(message, attachments);
-      });
+      setOptimisticMessages((prevMessages: MessageObject[]) => [
+        {
+          $id: "optimistic_message_" + i,
+          $createdAt: new Date().toLocaleDateString(),
+          $updatedAt: new Date().toLocaleDateString(),
+          $permissions: [],
+          author: user,
+          room: room,
+          message: message,
+          attachments: [],
+          $databaseId: "TEMPORARY",
+          $collectionId: "TEMPORARY",
+        },
+        ...prevMessages,
+      ]);
+      i++;
+      submitAction(message, attachments);
     }
   };
 
