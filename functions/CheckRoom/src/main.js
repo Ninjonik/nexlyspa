@@ -18,7 +18,15 @@ export default async ({ req, res }) => {
       });
 
     try {
-      await database.getDocument("nexly", "rooms", roomId);
+      const room = await database.getDocument("nexly", "rooms", roomId);
+      if(room?.closed){
+        console.log(roomId, "closed");
+        return res.json({
+          success: true,
+          message: "Room with the specified room code is currently closed.",
+          status: false,
+        });
+      }
       console.log(roomId, "exists");
       return res.json({
         success: true,

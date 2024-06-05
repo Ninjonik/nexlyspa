@@ -24,7 +24,7 @@ export const RoomListItem = ({ room }: RoomListItem) => {
         </div>
       </div>
       <div className={"flex flex-col gap-4 justify-center"}>
-        <span className={"font-bold"}>11:57 AM</span>
+        <span className={"font-bold"}>{room.closed}</span>
       </div>
     </div>
   );

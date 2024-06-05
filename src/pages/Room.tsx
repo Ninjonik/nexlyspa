@@ -92,7 +92,7 @@ export const Room = () => {
       <section className={"flex flex-col col-span-12 row-span-11"}>
         <section
             className={
-              "bg-base-200 overflow-y-auto h-full flex flex-col-reverse w-full p-4"
+              "bg-base-200 overflow-y-auto h-full flex flex-col-reverse w-full p-4 gap-4"
             }
         >
           <footer className={"w-full p-2"}>

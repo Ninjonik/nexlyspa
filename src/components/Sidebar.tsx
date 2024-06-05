@@ -37,7 +37,7 @@ export const Sidebar = () => {
       </section>
       <section className={"flex flex-row p-2 h-24"}>
         <div className={"flex flex-row w-full gap-4 justify-between"}>
-          <div className={"flex flex-row gap-4 w-2/3"}>
+          <div className={"flex flex-row gap-4 w-2/3 items-center"}>
             <Avatar />
             <div
               className={
