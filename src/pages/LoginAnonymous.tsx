@@ -1,7 +1,7 @@
 "use client";
 
 import { Link, useNavigate } from "react-router-dom";
-// @ts-ignore
+// @ts-expect-error erroneous due to outdated react types, will be fixed with react 19
 import { useActionState } from "react";
 import { account } from "../utils/appwrite.ts";
 import { UserAuthObject } from "../utils/interfaces/UserObject.ts";

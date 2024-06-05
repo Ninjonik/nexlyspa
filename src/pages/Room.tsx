@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { FullscreenLoading } from "../components/FullscreenLoading.tsx";
-// @ts-ignore
+// @ts-expect-error erroneous due to outdated react types, will be fixed with react 19
 import { useEffect, useState, useOptimistic } from "react";
 import RoomObject from "../utils/interfaces/RoomObject.ts";
 import { useRoomsContext } from "../utils/RoomsContext.tsx";
@@ -23,8 +23,8 @@ export const Room = () => {
   const [optimisticMessages, addOptimisticMessage] = useOptimistic(
     messages,
     (currentState: MessageObject[], newMessage: MessageObject) => [
-      ...currentState,
       newMessage,
+      ...currentState,
     ],
   );
 
@@ -91,15 +91,15 @@ export const Room = () => {
       </nav>
       <section className={"flex flex-col col-span-12 row-span-11"}>
         <section
-            className={
-              "bg-base-200 overflow-y-auto h-full flex flex-col-reverse w-full p-4 gap-4"
-            }
+          className={
+            "bg-base-200 overflow-y-auto h-full flex flex-col-reverse w-full p-4 gap-4"
+          }
         >
           <footer className={"w-full p-2"}>
-            <Textarea room={room} addOptimisticMessage={addOptimisticMessage}/>
+            <Textarea room={room} addOptimisticMessage={addOptimisticMessage} />
           </footer>
-          {messages.map((message: MessageObject) => (
-              <Message key={message.$id + "_om"} message={message}/>
+          {optimisticMessages.map((message: MessageObject) => (
+            <Message key={message.$id} message={message} />
           ))}
         </section>
       </section>

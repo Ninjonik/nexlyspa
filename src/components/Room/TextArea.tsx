@@ -1,4 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, {
+  // @ts-expect-error erroneous due to outdated react types, will be fixed with react 19
+  useActionState,
+  useEffect,
+  useState,
+  startTransition,
+  useRef,
+} from "react";
 import { FaPlus } from "react-icons/fa";
 import {
   AiOutlineDelete,
@@ -33,6 +40,7 @@ export const Textarea = ({
   const [attachments, setAttachments] = useState<File[]>([]);
   const [submitting, setSubmitting] = useState<boolean>(false);
   const { user } = useUserContext();
+  const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
     const keyDownHandler = (event: {
@@ -42,16 +50,14 @@ export const Textarea = ({
     }) => {
       if (event.key === "Enter" && !event.shiftKey) {
         event.preventDefault();
-        const attachmentsToSend = attachments || [];
-        if (!text && attachmentsToSend.length < 1) return null;
-        handleSubmit(text, attachmentsToSend);
+        if (formRef.current) formRef.current.requestSubmit();
       }
     };
 
     document.addEventListener("keydown", keyDownHandler);
 
     return () => document.removeEventListener("keydown", keyDownHandler);
-  }, [text, attachments]);
+  }, []);
 
   const submitAction = async (
     message: string = "",
@@ -102,26 +108,26 @@ export const Textarea = ({
     console.log(response);
   };
 
-  const handleSubmit = async (
-    message: string = "",
-    attachmentsToSend: File[] = [],
-  ) => {
-    if (!user) return null;
-
-    // addOptimisticMessage({
-    //   $id: "OPT_MESSAGE_" + Math.floor(Math.random() * 10000).toString(),
-    //   $createdAt: new Date().toLocaleDateString(),
-    //   $updatedAt: new Date().toLocaleDateString(),
-    //   $permissions: [],
-    //   author: user,
-    //   room: room,
-    //   message: message,
-    //   attachments: [],
-    //   $databaseId: "TEMPORARY",
-    //   $collectionId: "TEMPORARY",
-    // });
-
-    submitAction(message, attachmentsToSend);
+  const handleSubmit = (_prevState: string, queryData: FormData) => {
+    const message = queryData.get("message") as string;
+    if (user && message) {
+      // @ts-expect-error will be fixed in react 19's new types
+      startTransition(async () => {
+        // addOptimisticMessage({
+        //   $id: "optimistic_message",
+        //   $createdAt: new Date().toLocaleDateString(),
+        //   $updatedAt: new Date().toLocaleDateString(),
+        //   $permissions: [],
+        //   author: user,
+        //   room: room,
+        //   message: message,
+        //   attachments: [],
+        //   $databaseId: "TEMPORARY",
+        //   $collectionId: "TEMPORARY",
+        // });
+        await submitAction(message, attachments);
+      });
+    }
   };
 
   const updateAttachments = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -173,6 +179,9 @@ export const Textarea = ({
         ...files,
       ]),
   });
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_errorMessage, formAction] = useActionState(handleSubmit, null);
 
   return (
     <div
@@ -240,22 +249,23 @@ export const Textarea = ({
       </ul>
       <form
         className={"w-full flex justify-between items-center"}
-        onSubmit={(e) => e.preventDefault()}
+        action={formAction}
+        ref={formRef}
       >
-          <label>
-            <input
-              type="file"
-              className="hidden"
-              name="file1"
-              max={5}
-              multiple={true}
-              {...getInputProps()}
-              onChange={updateAttachments}
-            />
-            <a title={"Add attachment"} className={"p-2 text-2xl"}>
-              <FaPlus />
-            </a>
-          </label>
+        <label>
+          <input
+            type="file"
+            className="hidden"
+            name="file1"
+            max={5}
+            multiple={true}
+            {...getInputProps()}
+            onChange={updateAttachments}
+          />
+          <a title={"Add attachment"} className={"p-2 text-2xl"}>
+            <FaPlus />
+          </a>
+        </label>
         <TextareaAutosize
           className={`p-2 focus:outline-none focus:border-none w-full h-full ${className} resize-none bg-base-300 max-h-96 overflow-y-auto no-scrollbar flex items-center`}
           cacheMeasurements
@@ -263,6 +273,7 @@ export const Textarea = ({
           rows={1}
           onPaste={handlePaste}
           onChange={(e) => setText(e.target.value)}
+          name={"message"}
         />
         <div className={"flex justify-center items-center"}>
           <Tippy
@@ -271,7 +282,7 @@ export const Textarea = ({
                 tenorApiKey={
                   import.meta.env.VITE_PUBLIC_TENOR_KEY || "no_tenor_api_key"
                 }
-                onGifClick={(e: { url: string }) => handleSubmit(e.url)}
+                // onGifClick={(e: { url: string }) => handleSubmit(e.url)}
               />
             }
             trigger={"click"}
