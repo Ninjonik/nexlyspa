@@ -49,6 +49,7 @@ export const Message = ({ message }: MessageInterface) => {
     "rounded-r-lg",
     "text-base-content",
   ];
+  if (!_classes) return;
 
   return (
     <div className={`max-w-2/3 flex flex-row gap-4 ${own && "place-self-end"}`}>
