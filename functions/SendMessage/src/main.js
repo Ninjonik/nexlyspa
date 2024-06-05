@@ -13,6 +13,8 @@ export default async ({ req, res }) => {
     .setProject(process.env.APPWRITE_PROJECT)
     .setKey(process.env.APPWRITE_KEY);
 
+  const database = new Databases(client);
+
   const jwtClient = new Client()
     .setEndpoint(process.env.APPWRITE_ENDPOINT)
     .setProject(process.env.APPWRITE_PROJECT);
@@ -72,7 +74,7 @@ export default async ({ req, res }) => {
           message: "User is not in the room.",
         });
 
-      const result = await jwtDatabases.createDocument(
+      const result = await database.createDocument(
         "nexly",
         "messages",
         ID.unique(),
