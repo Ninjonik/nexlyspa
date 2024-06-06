@@ -128,6 +128,7 @@ export const Textarea = ({
 
   const updateAttachments = (e: React.ChangeEvent<HTMLInputElement>) => {
     const currentAttachmentsLength = attachments?.length || 0;
+    console.log("niggros", currentAttachmentsLength);
     if (currentAttachmentsLength > 5) return;
 
     const uploadedFiles: File[] = Array.from(e.target.files || []);
@@ -188,7 +189,7 @@ export const Textarea = ({
     >
       <ul
         className={
-          "flex flex-row gap-4 overflow-x-scroll h-0 max-w-48 max-w-screen no-scrollbar"
+          "flex flex-row gap-4 overflow-x-scroll w-full no-scrollbar p-2 justify-start"
         }
       >
         {attachments?.map((attachment: File, index) => {
@@ -217,24 +218,26 @@ export const Textarea = ({
               <div
                 className={"w-32 h-32 flex justify-center items-center pt-4"}
               >
-                {[
-                  "image/jpg",
-                  "image/jpeg",
-                  "image/png",
-                  "image/gif",
-                  "image/bmp",
-                  "image/webp",
-                ].includes(attachment.type) ? (
-                  <img
-                    className="rounded-md ease-in w-full h-full"
-                    alt={attachment.name}
-                    height={0}
-                    width={0}
-                    src={URL.createObjectURL(attachment)}
-                  />
-                ) : (
-                  <FileIcon extension={fileExtension} {...fileIconStyles} />
-                )}
+                <div className={"h-full w-full"}>
+                  {[
+                    "image/jpg",
+                    "image/jpeg",
+                    "image/png",
+                    "image/gif",
+                    "image/bmp",
+                    "image/webp",
+                  ].includes(attachment.type) ? (
+                    <img
+                      className="rounded-md ease-in w-full h-full"
+                      alt={attachment.name}
+                      height={0}
+                      width={0}
+                      src={URL.createObjectURL(attachment)}
+                    />
+                  ) : (
+                    <FileIcon extension={fileExtension} {...fileIconStyles} />
+                  )}
+                </div>
               </div>
               <div className={"text-sm break-words text-center"}>
                 {attachment.name}
@@ -258,7 +261,12 @@ export const Textarea = ({
             {...getInputProps()}
             onChange={updateAttachments}
           />
-          <a title={"Add attachment"} className={"p-2 text-2xl"}>
+          <a
+            title={"Add attachment"}
+            className={
+              "p-2 text-2xl text-primary hover:text-secondary ease-in transition-all hover:cursor-pointer"
+            }
+          >
             <FaPlus />
           </a>
         </label>

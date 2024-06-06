@@ -12,12 +12,12 @@ export const AttachmentList = ({
   own: boolean;
 }) => {
   return (
-    <div className={"flex flex-col gap-2"}>
+    <div className={"flex flex-col gap-4"}>
       {attachmentsData &&
         attachmentsData.map(({ preview, file, extension }) => (
           <div
             key={file?.$id + "_attachment_div"}
-            className={"max-h-96 max-w-96 relative lg:pr-16 h-96 w-96"}
+            className={"relative flex flex-col"}
           >
             {preview && file && extension && (
               <>
@@ -31,23 +31,29 @@ export const AttachmentList = ({
                 ].includes(file.mimeType) ? (
                   <PhotoView src={preview}>
                     <img
-                      className={`rounded-b-lg ease-in ${own ? "rounded-l-md bg-primary text-base-100" : "rounded-r-md bg-base-300 text-left"}`}
+                      className={`max-h-96 max-w-96 w-48 h-48 rounded-b-lg ease-in ${own ? "rounded-l-md text-base-100" : "rounded-r-md text-left"}`}
                       alt={file.name}
                       src={preview}
                     />
                   </PhotoView>
                 ) : (
-                  <FileIcon
-                    extension={extension}
-                    {...(defaultStyles[extension as DefaultExtensionType] ||
-                      defaultStyles.png)}
-                  />
+                  <div className={"w-48 flex flex-col"}>
+                    <FileIcon
+                      extension={extension}
+                      {...(defaultStyles[extension as DefaultExtensionType] ||
+                        defaultStyles.png)}
+                    />
+                    <span className={"text-center text-primary"}>
+                      {file.name}
+                    </span>
+                  </div>
                 )}
-                <div className={"bottom-0 right-0 absolute"}>
+                <div className={`${own && "place-self-end"}`}>
                   <a
                     title={"Download the file"}
                     href={getFileDownload("attachments", file?.$id) ?? ""}
                     download={true}
+                    className={"text-4xl"}
                   >
                     <AiOutlineDownload />
                   </a>

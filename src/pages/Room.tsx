@@ -13,6 +13,7 @@ import { Message } from "../components/Room/Message.tsx";
 import { client, database, databases } from "../utils/appwrite.ts";
 import { useUserContext } from "../utils/UserContext.tsx";
 import { Query } from "appwrite";
+import { PhotoProvider } from "react-photo-view";
 
 export const Room = () => {
   const navigate = useNavigate();
@@ -44,9 +45,7 @@ export const Room = () => {
   }, [rooms, roomId]);
 
   useEffect(() => {
-    console.log("A");
     if (room && room.$id) {
-      console.info("B");
       const unsubscribeMessages = client.subscribe(
         `databases.${database}.collections.messages.documents`,
         (response) => {
@@ -67,7 +66,6 @@ export const Room = () => {
       );
 
       return () => {
-        console.warn("C");
         unsubscribeMessages();
       };
     }
@@ -121,9 +119,11 @@ export const Room = () => {
           {optimisticMessages.map((message: MessageObject) => (
             <Message key={message.$id} message={message} />
           ))}
-          {messages.map((message: MessageObject) => (
-            <Message key={message.$id} message={message} />
-          ))}
+          <PhotoProvider>
+            {messages.map((message: MessageObject) => (
+              <Message key={message.$id} message={message} />
+            ))}
+          </PhotoProvider>
         </section>
         <footer className={"w-full p-2 bg-base-200"}>
           <Textarea room={room} setOptimisticMessages={setOptimisticMessages} />

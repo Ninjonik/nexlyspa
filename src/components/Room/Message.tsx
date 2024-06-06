@@ -17,27 +17,23 @@ export const Message = ({ message }: MessageInterface) => {
     [],
   );
 
-  const fetchAttachmentsData = () => {
-    return async () => {
-      const attachmentsData = await Promise.all(
-        message.attachments.map(async (attachmentId: string) => {
-          const { preview, file, extension } = await getFileData(
-            "attachments",
-            attachmentId,
-          );
-          if (!preview || !file || !extension) return null;
-          return { preview, file, extension };
-        }),
-      );
-      setAttachmentsData(
-        attachmentsData.filter(Boolean) as getFileDataResult[],
-      );
-    };
+  const fetchAttachmentsData = async () => {
+    const attachmentsData = await Promise.all(
+      message.attachments.map(async (attachmentId: string) => {
+        const { preview, file, extension } = await getFileData(
+          "attachments",
+          attachmentId,
+        );
+        if (!preview || !file || !extension) return null;
+        return { preview, file, extension };
+      }),
+    );
+    setAttachmentsData(attachmentsData.filter(Boolean) as getFileDataResult[]);
   };
 
   useEffect(() => {
     fetchAttachmentsData();
-  }, [message.attachments]);
+  }, [message, message.attachments]);
 
   if (!message || !message.author || !user) return null;
 
@@ -52,7 +48,7 @@ export const Message = ({ message }: MessageInterface) => {
     "text-base-content",
   ];
   if (!_classes) return;
-
+  console.log(attachmentsData);
   return (
     <div
       className={`max-w-2/3 flex flex-row gap-4 ${own && "place-self-end"} ${message.$collectionId === "TEMPORARY" && "opacity-50"}`}
