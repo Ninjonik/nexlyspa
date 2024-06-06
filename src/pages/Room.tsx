@@ -10,8 +10,9 @@ import { IoMdExit } from "react-icons/io";
 import { Textarea } from "../components/Room/TextArea.tsx";
 import MessageObject from "../utils/interfaces/MessageObject.ts";
 import { Message } from "../components/Room/Message.tsx";
-import { client, database } from "../utils/appwrite.ts";
+import { client, database, databases } from "../utils/appwrite.ts";
 import { useUserContext } from "../utils/UserContext.tsx";
+import { Query } from "appwrite";
 
 export const Room = () => {
   const navigate = useNavigate();
@@ -25,15 +26,27 @@ export const Room = () => {
   );
   const optimisticMessagesRef = useRef<MessageObject[]>([]);
 
+  const fetchMessages = async (roomId: string): Promise<void> => {
+    const res = await databases.listDocuments(database, "messages", [
+      Query.equal("room", roomId),
+      Query.orderDesc("$updatedAt"),
+      Query.limit(50),
+    ]);
+    const messages = res.documents as MessageObject[];
+    setMessages(messages);
+  };
+
   useEffect(() => {
     if (roomId && rooms && rooms[roomId]) {
       setRoom(rooms[roomId]);
-      setMessages(rooms[roomId].messages);
+      fetchMessages(roomId);
     }
   }, [rooms, roomId]);
 
   useEffect(() => {
+    console.log("A");
     if (room && room.$id) {
+      console.info("B");
       const unsubscribeMessages = client.subscribe(
         `databases.${database}.collections.messages.documents`,
         (response) => {
@@ -54,6 +67,7 @@ export const Room = () => {
       );
 
       return () => {
+        console.warn("C");
         unsubscribeMessages();
       };
     }
@@ -104,12 +118,6 @@ export const Room = () => {
             "bg-base-200 overflow-y-auto h-full flex flex-col-reverse w-full p-4 gap-4"
           }
         >
-          <footer className={"w-full p-2"}>
-            <Textarea
-              room={room}
-              setOptimisticMessages={setOptimisticMessages}
-            />
-          </footer>
           {optimisticMessages.map((message: MessageObject) => (
             <Message key={message.$id} message={message} />
           ))}
@@ -117,6 +125,9 @@ export const Room = () => {
             <Message key={message.$id} message={message} />
           ))}
         </section>
+        <footer className={"w-full p-2 bg-base-200"}>
+          <Textarea room={room} setOptimisticMessages={setOptimisticMessages} />
+        </footer>
       </section>
     </section>
   );

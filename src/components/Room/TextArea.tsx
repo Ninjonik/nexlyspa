@@ -41,7 +41,6 @@ export const Textarea = ({
   const [attachments, setAttachments] = useState<File[]>([]);
   const { user } = useUserContext();
   const formRef = useRef<HTMLFormElement>(null);
-  let i = 0;
 
   useEffect(() => {
     const keyDownHandler = (event: {
@@ -110,7 +109,7 @@ export const Textarea = ({
     if (user && message) {
       setOptimisticMessages((prevMessages: MessageObject[]) => [
         {
-          $id: "optimistic_message_" + i,
+          $id: "optimistic_message_" + new Date().toISOString(),
           $createdAt: new Date().toLocaleDateString(),
           $updatedAt: new Date().toLocaleDateString(),
           $permissions: [],
@@ -123,7 +122,6 @@ export const Textarea = ({
         },
         ...prevMessages,
       ]);
-      i++;
       submitAction(message, attachments);
     }
   };
@@ -299,7 +297,7 @@ export const Textarea = ({
               <EmojiPicker
                 emojiStyle={EmojiStyle.TWITTER}
                 onEmojiClick={(emoji: EmojiClickData) =>
-                  setText((prevText) => prevText + " " + emoji.emoji)
+                  setText((prevText) => prevText + emoji.emoji)
                 }
               />
             }

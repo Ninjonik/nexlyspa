@@ -4,6 +4,8 @@ import { useUserContext } from "../../utils/UserContext.tsx";
 import { AttachmentList } from "./AttachmentList.tsx";
 import React, { useEffect, useState } from "react";
 import getFileData, { getFileDataResult } from "../../utils/getFileData.ts";
+import formatTimestampToDate from "../../utils/formatTimestampToDate.ts";
+import formatTimestampToTime from "../../utils/formatTimestampToTime.ts";
 
 interface MessageInterface {
   message: MessageObject;
@@ -52,7 +54,9 @@ export const Message = ({ message }: MessageInterface) => {
   if (!_classes) return;
 
   return (
-    <div className={`max-w-2/3 flex flex-row gap-4 ${own && "place-self-end"}`}>
+    <div
+      className={`max-w-2/3 flex flex-row gap-4 ${own && "place-self-end"} ${message.$collectionId === "TEMPORARY" && "opacity-50"}`}
+    >
       <Avatar />
       <div
         className={`flex flex-col text-start justify-center gap-2 ${own && "order-first"}`}
@@ -61,15 +65,19 @@ export const Message = ({ message }: MessageInterface) => {
           <h3 className={`text-primary font-bold ${own && "order-last"}`}>
             {message.author.name}
           </h3>
-          <h4 className={""}>{message.$updatedAt}</h4>
+          <h4 className={""}>
+            <span className={``}>
+              {formatTimestampToDate(message.$updatedAt)}
+            </span>{" "}
+            <span className={``}>
+              {formatTimestampToTime(message.$updatedAt)}
+            </span>
+          </h4>
         </div>
         <h4
           className={`${own ? "bg-primary rounded-l-lg text-white" : "bg-base-100 rounded-r-lg text-base-content"} rounded-b-lg p-1`}
         >
           {message.message}
-          {message.$collectionId === "TEMPORARY" && (
-            <span className={"text-opacity-75"}>sending...</span>
-          )}
         </h4>
         <MemoizedAttachmentList attachmentsData={attachmentsData} own={own} />
       </div>
