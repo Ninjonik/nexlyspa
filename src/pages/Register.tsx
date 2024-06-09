@@ -1,6 +1,6 @@
 "use client";
 
-import { Link, useNavigate } from "react-router-dom";
+import { Link, redirect } from "react-router-dom";
 // @ts-expect-error erroneous due to outdated react types, will be fixed with react 19
 import { useActionState } from "react";
 import { account } from "../utils/appwrite.ts";
@@ -9,7 +9,6 @@ import { UserAuthObject } from "../utils/interfaces/UserObject.ts";
 import { ID } from "appwrite";
 
 export const Register = () => {
-  const navigate = useNavigate();
   const { getUserData, logoutUser } = useUserContext();
 
   const handleRegister = async (_prevState: null, queryData: FormData) => {
@@ -24,7 +23,7 @@ export const Register = () => {
       await account.createEmailPasswordSession(email, password);
       const newAccount = (await account.get()) as UserAuthObject;
       await getUserData(newAccount);
-      navigate("/");
+      redirect("/home");
     } catch (e) {
       return (e as Error).message;
     }

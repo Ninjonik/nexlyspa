@@ -3,12 +3,11 @@ import { useActionState, useState } from "react";
 import { account, functions } from "../utils/appwrite.ts";
 import { ExecutionMethod } from "appwrite";
 import { useUserContext } from "../utils/UserContext.tsx";
-import { useNavigate } from "react-router-dom";
+import { redirect } from "react-router-dom";
 
 export const Homepage = () => {
   const [pending, setPending] = useState<boolean>(false);
   const { setUser } = useUserContext();
-  const navigate = useNavigate();
 
   const handleRoomSubmit = async (_prevState: null, queryData: FormData) => {
     setPending(true);
@@ -70,7 +69,7 @@ export const Homepage = () => {
 
     // Handle the common stuff
     setUser(response.newUser);
-    navigate("/room/" + response.roomCode);
+    redirect("/room/" + response.roomCode);
   };
 
   const [messageJoin, formActionJoin] = useActionState(handleRoomSubmit, null);

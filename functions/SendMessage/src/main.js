@@ -53,7 +53,11 @@ export default async ({ req, res }) => {
     }
 
     try {
-      const roomData = await jwtDatabases.getDocument("nexly", "rooms", roomId);
+      const roomData = await jwtDatabases.getDocument(
+        process.env.APPWRITE_DATABASE,
+        "rooms",
+        roomId,
+      );
 
       if (!roomData)
         return res.json({
@@ -75,7 +79,7 @@ export default async ({ req, res }) => {
         });
 
       const result = await database.createDocument(
-        "nexly",
+        process.env.APPWRITE_DATABASE,
         "messages",
         ID.unique(),
         {

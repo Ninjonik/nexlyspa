@@ -18,8 +18,12 @@ export default async ({ req, res }) => {
       });
 
     try {
-      const room = await database.getDocument("nexly", "rooms", roomId);
-      if(room?.closed){
+      const room = await database.getDocument(
+        process.env.APPWRITE_DATABASE,
+        "rooms",
+        roomId,
+      );
+      if (room?.closed) {
         console.log(roomId, "closed");
         return res.json({
           success: true,

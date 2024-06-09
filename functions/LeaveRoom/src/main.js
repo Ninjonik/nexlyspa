@@ -3,7 +3,6 @@ import {
   Databases,
   Account,
   Functions,
-  ExecutionMethod,
   Permission,
   Role,
 } from "node-appwrite";
@@ -53,39 +52,39 @@ export default async ({ req, res }) => {
     }
 
     try {
-      const result = await functions.createExecution(
-        "checkRoom",
-        JSON.stringify({
-          roomId: roomCode,
-        }),
-        false,
-        undefined,
-        ExecutionMethod.GET,
-      );
-
-      const response = JSON.parse(result.responseBody);
-      if (!response.success || !response.status) {
-        return res.json({
-          success: false,
-          message:
-            "Room with the specified code does not exist or it is currently closed.",
-        });
-      }
-
       const roomData = await database.getDocument(
         process.env.APPWRITE_DATABASE,
         "rooms",
         roomCode,
       );
 
-      const newRoomUsers = roomData?.users
-        ? [...roomData.users, account.$id]
-        : [account.$id];
+      let newRoomUsers = [...roomData.users];
+      let userIndex = newRoomUsers.findIndex(
+        (user) => user.$id === account.$id,
+      );
+
+      if (userIndex > -1) {
+        newRoomUsers.splice(userIndex, 1);
+      }
+
+      // If the room is empty then delete it
+      if (!newRoomUsers || newRoomUsers.length === 0) {
+        await database.deleteDocument(
+          process.env.APPWRITE_DATABASE,
+          "rooms",
+          roomCode,
+        );
+      }
+
+      let newRoomDataPermissions = [...roomData.$permissions];
       const userPermissions = [Permission.read(Role.user(account.$id))];
-      const newRoomPermissions =
-        roomData?.$permissions && roomData?.$permissions.length > 0
-          ? [...roomData.$permissions, ...userPermissions]
-          : userPermissions;
+      for (let i = 0; i < userPermissions.length; i++) {
+        const userPermission = userPermissions[i];
+        const index = newRoomDataPermissions.indexOf(userPermission);
+        if (index > -1) {
+          newRoomDataPermissions.splice(index, 1);
+        }
+      }
 
       const newRoom = await database.updateDocument(
         process.env.APPWRITE_DATABASE,
@@ -94,7 +93,7 @@ export default async ({ req, res }) => {
         {
           users: newRoomUsers,
         },
-        newRoomPermissions,
+        newRoomDataPermissions,
       );
 
       if (newRoom) {

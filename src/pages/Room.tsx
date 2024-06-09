@@ -1,7 +1,7 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { redirect, useParams } from "react-router-dom";
 import { FullscreenLoading } from "../components/FullscreenLoading.tsx";
 import { useEffect, useRef, useState } from "react";
-import RoomObject from "../utils/interfaces/RoomObject.ts";
+import RoomObject, { RoomObjectArray } from "../utils/interfaces/RoomObject.ts";
 import { useRoomsContext } from "../utils/RoomsContext.tsx";
 import Avatar from "../components/Avatar.tsx";
 import { MdCall } from "react-icons/md";
@@ -10,22 +10,53 @@ import { IoMdExit } from "react-icons/io";
 import { Textarea } from "../components/Room/TextArea.tsx";
 import MessageObject from "../utils/interfaces/MessageObject.ts";
 import { Message } from "../components/Room/Message.tsx";
-import { client, database, databases } from "../utils/appwrite.ts";
+import {
+  account,
+  client,
+  database,
+  databases,
+  functions,
+} from "../utils/appwrite.ts";
 import { useUserContext } from "../utils/UserContext.tsx";
-import { Query } from "appwrite";
+import { ExecutionMethod, Query } from "appwrite";
 import { PhotoProvider } from "react-photo-view";
+import { RoomSkeleton } from "../components/Room/RoomSkeleton.tsx";
 
 export const Room = () => {
-  const navigate = useNavigate();
   const { user } = useUserContext();
   const { roomId } = useParams();
   const [room, setRoom] = useState<null | RoomObject>(null);
-  const { rooms } = useRoomsContext();
+  const { rooms, setRooms } = useRoomsContext();
   const [messages, setMessages] = useState<MessageObject[]>([]);
   const [optimisticMessages, setOptimisticMessages] = useState<MessageObject[]>(
     [],
   );
   const optimisticMessagesRef = useRef<MessageObject[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  const leaveRoom = async (roomId: string) => {
+    const jwt = await account.createJWT();
+    const result = await functions.createExecution(
+      "leaveRoom",
+      JSON.stringify({
+        jwt: jwt.jwt,
+        roomCode: roomId,
+      }),
+      false,
+      undefined,
+      ExecutionMethod.POST,
+    );
+    const response = JSON.parse(result.responseBody);
+    console.log(result, response);
+    if (response.success && response.status) {
+      if (rooms && Array.from(Object.keys(rooms)).length > 0) {
+        const newRooms: RoomObjectArray = { ...rooms };
+        delete newRooms[roomId];
+        setRooms(newRooms);
+      }
+      redirect("/home");
+    }
+  };
 
   const fetchMessages = async (roomId: string): Promise<void> => {
     const res = await databases.listDocuments(database, "messages", [
@@ -35,9 +66,11 @@ export const Room = () => {
     ]);
     const messages = res.documents as MessageObject[];
     setMessages(messages);
+    setLoading(false);
   };
 
   useEffect(() => {
+    setLoading(true);
     if (roomId && rooms && rooms[roomId]) {
       setRoom(rooms[roomId]);
       fetchMessages(roomId);
@@ -75,12 +108,16 @@ export const Room = () => {
     optimisticMessagesRef.current = optimisticMessages;
   }, [optimisticMessages]);
 
+  if (loading) return <RoomSkeleton />;
+
   if (!roomId) {
-    navigate("/");
+    redirect("/home");
     return <FullscreenLoading />;
   }
 
   if (!room) return <FullscreenLoading />;
+
+  console.log(loading);
 
   return (
     <section
@@ -99,13 +136,20 @@ export const Room = () => {
           </div>
         </div>
         <div className={"flex flex-row items-center gap-4"}>
-          <a title={"Call"} className={"text-4xl"}>
+          <a title={"Call"} className={"text-4xl hover:cursor-pointer"}>
             <MdCall />
           </a>
-          <a title={"Toggle users sidebar"} className={"text-4xl"}>
+          <a
+            title={"Toggle users sidebar"}
+            className={"text-4xl hover:cursor-pointer"}
+          >
             <FaUsers />
           </a>
-          <a title={"Leave the room"} className={"text-4xl"}>
+          <a
+            title={"Leave the room"}
+            className={"text-4xl hover:cursor-pointer"}
+            onClick={() => leaveRoom(room.$id)}
+          >
             <IoMdExit />
           </a>
         </div>

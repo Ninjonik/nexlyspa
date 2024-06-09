@@ -20,7 +20,11 @@ export default async ({ req, res }) => {
       });
 
     try {
-      await database.deleteDocument("nexly", "users", removedUserId);
+      await database.deleteDocument(
+        process.env.APPWRITE_DATABASE,
+        "users",
+        removedUserId,
+      );
     } catch (err) {
       console.log(`Can't delete user record.`);
     }

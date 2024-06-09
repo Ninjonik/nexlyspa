@@ -48,14 +48,13 @@ export const Message = ({ message }: MessageInterface) => {
     "text-base-content",
   ];
   if (!_classes) return;
-  console.log(attachmentsData);
   return (
     <div
       className={`max-w-2/3 flex flex-row gap-4 ${own && "place-self-end"} ${message.$collectionId === "TEMPORARY" && "opacity-50"}`}
     >
       <Avatar />
       <div
-        className={`flex flex-col text-start justify-center gap-2 ${own && "order-first"}`}
+        className={`inline-flex flex-col text-start justify-center gap-2 ${own && "order-first"}`}
       >
         <div className={"flex flex-row gap-2 items-center"}>
           <h3 className={`text-primary font-bold ${own && "order-last"}`}>
