@@ -13,6 +13,7 @@ export default function RoutesList() {
     <Routes>
       <Route element={<Main />}>
         <Route path="/" element={<Homepage />} />
+        <Route path="/home" element={<Homepage />} />
         <Route path="/room" element={<Room />} />
         <Route path="/room/:roomId" element={<Room />} />
       </Route>

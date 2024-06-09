@@ -58,7 +58,7 @@ export const UserContextProvider = ({ children }: UserContextProps) => {
         ...userDBData,
       };
       setUser(combinedUserObject);
-      if (noAuthRequiredRoutes.includes(currentPage)) navigate("/");
+      if (noAuthRequiredRoutes.includes(currentPage)) navigate("/home");
     } catch (e) {
       if (!noAuthRequiredRoutes.includes(currentPage)) navigate("/login");
       return console.info("user not logged in");
