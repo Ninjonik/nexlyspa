@@ -14,6 +14,7 @@ import { client, database, databases } from "../utils/appwrite.ts";
 import { useUserContext } from "../utils/UserContext.tsx";
 import { Query } from "appwrite";
 import { PhotoProvider } from "react-photo-view";
+import { RoomSkeleton } from "../components/Room/RoomSkeleton.tsx";
 
 export const Room = () => {
   const navigate = useNavigate();
@@ -26,6 +27,7 @@ export const Room = () => {
     [],
   );
   const optimisticMessagesRef = useRef<MessageObject[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const fetchMessages = async (roomId: string): Promise<void> => {
     const res = await databases.listDocuments(database, "messages", [
@@ -35,9 +37,11 @@ export const Room = () => {
     ]);
     const messages = res.documents as MessageObject[];
     setMessages(messages);
+    setLoading(false);
   };
 
   useEffect(() => {
+    setLoading(true);
     if (roomId && rooms && rooms[roomId]) {
       setRoom(rooms[roomId]);
       fetchMessages(roomId);
@@ -75,12 +79,16 @@ export const Room = () => {
     optimisticMessagesRef.current = optimisticMessages;
   }, [optimisticMessages]);
 
+  if (loading) return <RoomSkeleton />;
+
   if (!roomId) {
     navigate("/");
     return <FullscreenLoading />;
   }
 
   if (!room) return <FullscreenLoading />;
+
+  console.log(loading);
 
   return (
     <section
