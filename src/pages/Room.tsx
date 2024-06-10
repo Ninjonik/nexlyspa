@@ -2,7 +2,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import { FullscreenLoading } from "../components/FullscreenLoading.tsx";
 import { useEffect, useRef, useState } from "react";
 import RoomObject from "../utils/interfaces/RoomObject.ts";
-import { useRoomsContext } from "../utils/RoomsContext.tsx";
 import { Textarea } from "../components/Room/TextArea.tsx";
 import MessageObject from "../utils/interfaces/MessageObject.ts";
 import { Message } from "../components/Room/Message.tsx";
@@ -26,7 +25,6 @@ export const Room = () => {
   const { user } = useUserContext();
   const { roomId } = useParams();
   const [room, setRoom] = useState<null | RoomObject>(null);
-  const { rooms } = useRoomsContext();
   const [messages, setMessages] = useState<MessageObject[]>([]);
   const [optimisticMessages, setOptimisticMessages] = useState<MessageObject[]>(
     [],
@@ -82,11 +80,29 @@ export const Room = () => {
 
   useEffect(() => {
     setLoading(true);
-    if (roomId && rooms && rooms[roomId]) {
-      setRoom(rooms[roomId]);
-      fetchMessages(roomId);
-    }
-  }, [rooms, roomId]);
+    if (!roomId) return;
+    const fetchRoomData = async () => {
+      const res = await databases.getDocument(database, "rooms", roomId);
+      if (!res) return;
+      setRoom(res as RoomObject);
+    };
+
+    fetchRoomData();
+    fetchMessages(roomId);
+
+    const unsubscribeRoom = client.subscribe(
+      `databases.${database}.collections.rooms.documents.${roomId}`,
+      (response) => {
+        const payload = response.payload as RoomObject;
+        console.log("NEW ROOM PAYLOAD", payload);
+        setRoom(payload);
+      },
+    );
+
+    return () => {
+      unsubscribeRoom();
+    };
+  }, []);
 
   useEffect(() => {
     if (room && room.$id) {

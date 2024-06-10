@@ -75,6 +75,23 @@ export default function RoomNavbar({
     }
   };
 
+  const leaveTheCall = async (roomId: string) => {
+    setInCall(false);
+    const jwt = await account.createJWT();
+    const result = await functions.createExecution(
+      "checkCallStatus",
+      JSON.stringify({
+        jwt: jwt.jwt,
+        roomId: roomId,
+      }),
+      false,
+      undefined,
+      ExecutionMethod.GET,
+    );
+    const response = JSON.parse(result.responseBody);
+    console.info(response);
+  };
+
   return (
     <nav
       className={
@@ -91,12 +108,16 @@ export default function RoomNavbar({
       <div className={"flex flex-row items-center gap-4"}>
         {room.call ? (
           inCall ? (
-            <a title={"Hang"} className={"text-4xl hover:cursor-pointer"}>
+            <a
+              onClick={() => leaveTheCall(room.$id)}
+              title={"Hang"}
+              className={"text-4xl hover:cursor-pointer"}
+            >
               <ImPhoneHangUp />
             </a>
           ) : (
             <a title={"Join Call"} className={"text-4xl hover:cursor-pointer"}>
-              <TbPhonePlus />
+              <TbPhonePlus onClick={() => setInCall(true)} />
             </a>
           )
         ) : (
