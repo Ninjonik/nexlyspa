@@ -78,12 +78,6 @@ export const Textarea = ({
     if (attachmentsToSend.length > 0) {
       attachmentIds = await uploadMultipleFiles(attachmentsToSend);
     }
-    console.log({
-      jwt: jwt.jwt,
-      message: message,
-      attachments: attachmentIds,
-      roomId: room.$id,
-    });
 
     const result = await functions.createExecution(
       "sendMessage",
@@ -100,8 +94,6 @@ export const Textarea = ({
 
     const response = JSON.parse(result.responseBody);
     if (!response) return;
-
-    console.log(response);
   };
 
   const handleSubmit = (_prevState: string, queryData: FormData) => {
@@ -128,7 +120,6 @@ export const Textarea = ({
 
   const updateAttachments = (e: React.ChangeEvent<HTMLInputElement>) => {
     const currentAttachmentsLength = attachments?.length || 0;
-    console.log("niggros", currentAttachmentsLength);
     if (currentAttachmentsLength > 5) return;
 
     const uploadedFiles: File[] = Array.from(e.target.files || []);
@@ -271,7 +262,7 @@ export const Textarea = ({
           </a>
         </label>
         <TextareaAutosize
-          className={`p-2 focus:outline-none focus:border-none w-full h-full ${className} resize-none bg-base-300 max-h-96 overflow-y-auto no-scrollbar flex items-center`}
+          className={`p-2 focus:outline-none focus:border-none w-full h-full ${className} resize-none bg-base-300 max-h-[30dvh] overflow-y-auto no-scrollbar flex items-center`}
           cacheMeasurements
           value={text}
           rows={1}

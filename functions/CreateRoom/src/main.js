@@ -9,7 +9,7 @@ import {
 } from "node-appwrite";
 import { generate } from "random-words";
 
-const generateUniqueRoomCode = async (functions) => {
+const generateUniqueroomId = async (functions) => {
   let generatedCode = "";
   let codeExists = true;
 
@@ -87,7 +87,7 @@ export default async ({ req, res }) => {
     }
 
     try {
-      const generatedCode = await generateUniqueRoomCode(functions);
+      const generatedCode = await generateUniqueroomId(functions);
 
       const newRoom = {
         $id: generatedCode,
@@ -129,7 +129,7 @@ export default async ({ req, res }) => {
           success: true,
           message: "Successfully created a new room!",
           newUser: newUser,
-          roomCode: generatedCode,
+          roomId: generatedCode,
         });
       }
       return res.json({

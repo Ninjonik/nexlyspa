@@ -9,7 +9,7 @@ export const RoomSkeleton = () => {
     "h-96",
   ];
   const widthClasses = ["w-40", "w-48", "w-56", "w-64", "w-72", "w-80", "w-96"];
-  console.info(heightClasses, widthClasses);
+
   return (
     <section
       className={

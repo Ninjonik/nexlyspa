@@ -1,12 +1,7 @@
-import { redirect, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { FullscreenLoading } from "../components/FullscreenLoading.tsx";
 import { useEffect, useRef, useState } from "react";
-import RoomObject, { RoomObjectArray } from "../utils/interfaces/RoomObject.ts";
-import { useRoomsContext } from "../utils/RoomsContext.tsx";
-import Avatar from "../components/Avatar.tsx";
-import { MdCall } from "react-icons/md";
-import { FaUsers } from "react-icons/fa6";
-import { IoMdExit } from "react-icons/io";
+import RoomObject from "../utils/interfaces/RoomObject.ts";
 import { Textarea } from "../components/Room/TextArea.tsx";
 import MessageObject from "../utils/interfaces/MessageObject.ts";
 import { Message } from "../components/Room/Message.tsx";
@@ -21,12 +16,15 @@ import { useUserContext } from "../utils/UserContext.tsx";
 import { ExecutionMethod, Query } from "appwrite";
 import { PhotoProvider } from "react-photo-view";
 import { RoomSkeleton } from "../components/Room/RoomSkeleton.tsx";
+import RoomNavbar from "../components/Room/RoomNavbar.tsx";
+import { LiveKitRoom } from "@livekit/components-react";
+import VideoConference from "../components/Room/VideoConference.tsx";
+import { CiMaximize1, CiMinimize1 } from "react-icons/ci";
 
 export const Room = () => {
   const { user } = useUserContext();
   const { roomId } = useParams();
   const [room, setRoom] = useState<null | RoomObject>(null);
-  const { rooms, setRooms } = useRoomsContext();
   const [messages, setMessages] = useState<MessageObject[]>([]);
   const [optimisticMessages, setOptimisticMessages] = useState<MessageObject[]>(
     [],
@@ -34,29 +32,11 @@ export const Room = () => {
   const optimisticMessagesRef = useRef<MessageObject[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const leaveRoom = async (roomId: string) => {
-    const jwt = await account.createJWT();
-    const result = await functions.createExecution(
-      "leaveRoom",
-      JSON.stringify({
-        jwt: jwt.jwt,
-        roomCode: roomId,
-      }),
-      false,
-      undefined,
-      ExecutionMethod.POST,
-    );
-    const response = JSON.parse(result.responseBody);
-    console.log(result, response);
-    if (response.success && response.status) {
-      if (rooms && Array.from(Object.keys(rooms)).length > 0) {
-        const newRooms: RoomObjectArray = { ...rooms };
-        delete newRooms[roomId];
-        setRooms(newRooms);
-      }
-      redirect("/home");
-    }
-  };
+  const [token, setToken] = useState<string>("");
+  const [inCall, setInCall] = useState<boolean>(false);
+  const [fullscreenCall, setFullscreenCall] = useState<boolean>(false);
+
+  const navigate = useNavigate();
 
   const fetchMessages = async (roomId: string): Promise<void> => {
     const res = await databases.listDocuments(database, "messages", [
@@ -70,12 +50,59 @@ export const Room = () => {
   };
 
   useEffect(() => {
+    if (!room || !room.call || !user?.name) return;
+
+    (async () => {
+      try {
+        const jwt = await account.createJWT();
+
+        const result = await functions.createExecution(
+          "getParticipantToken",
+          JSON.stringify({
+            jwt: jwt.jwt,
+            roomId: room.$id,
+          }),
+          false,
+          undefined,
+          ExecutionMethod.GET,
+        );
+        const response = JSON.parse(result.responseBody);
+        console.log(result, response);
+        if (!response.success || !response.status)
+          return "Failed to create a call token.";
+
+        setToken(response.token);
+      } catch (e) {
+        console.error(e);
+      }
+    })();
+  }, [room?.call, user?.name]);
+
+  useEffect(() => {
     setLoading(true);
-    if (roomId && rooms && rooms[roomId]) {
-      setRoom(rooms[roomId]);
-      fetchMessages(roomId);
-    }
-  }, [rooms, roomId]);
+    if (!roomId) return;
+    const fetchRoomData = async () => {
+      const res = await databases.getDocument(database, "rooms", roomId);
+      if (!res) return;
+      setRoom(res as RoomObject);
+    };
+
+    fetchRoomData();
+    fetchMessages(roomId);
+
+    const unsubscribeRoom = client.subscribe(
+      `databases.${database}.collections.rooms.documents.${roomId}`,
+      (response) => {
+        const payload = response.payload as RoomObject;
+        console.log("NEW ROOM PAYLOAD", payload);
+        setRoom(payload);
+      },
+    );
+
+    return () => {
+      unsubscribeRoom();
+    };
+  }, []);
 
   useEffect(() => {
     if (room && room.$id) {
@@ -84,7 +111,6 @@ export const Room = () => {
         (response) => {
           const payload = response.payload as MessageObject;
           const messageRoomId = payload.room.$id;
-          console.log(payload);
           if (messageRoomId === room.$id && user)
             if (
               payload.author.$id === user.$id &&
@@ -111,50 +137,56 @@ export const Room = () => {
   if (loading) return <RoomSkeleton />;
 
   if (!roomId) {
-    redirect("/home");
+    navigate("/home");
     return <FullscreenLoading />;
   }
 
   if (!room) return <FullscreenLoading />;
 
-  console.log(loading);
+  const handleOnDisconnectedFn = async () => {};
 
   return (
     <section
       className={"grid grid-cols-12 grid-rows-12 w-full h-full overflow-hidden"}
     >
-      <nav
-        className={
-          "col-span-12 row-span-1 flex flex-row p-2 items-center mx-12 justify-between"
-        }
-      >
-        <div className={"flex flex-row gap-4"}>
-          <Avatar />
-          <div className={"flex flex-col text-start justify-center"}>
-            <h3 className={"text-primary font-bold"}>{room.name}</h3>
-            <h4>{room.description}</h4>
-          </div>
-        </div>
-        <div className={"flex flex-row items-center gap-4"}>
-          <a title={"Call"} className={"text-4xl hover:cursor-pointer"}>
-            <MdCall />
-          </a>
-          <a
-            title={"Toggle users sidebar"}
-            className={"text-4xl hover:cursor-pointer"}
-          >
-            <FaUsers />
-          </a>
-          <a
-            title={"Leave the room"}
-            className={"text-4xl hover:cursor-pointer"}
-            onClick={() => leaveRoom(room.$id)}
-          >
-            <IoMdExit />
-          </a>
-        </div>
-      </nav>
+      <RoomNavbar room={room} inCall={inCall} setInCall={setInCall} />
       <section className={"flex flex-col col-span-12 row-span-11"}>
+        {inCall && (
+          <section
+            className={`flex flex-col gap-[1dvw] bg-light transition-all duration-100 ${fullscreenCall ? "absolute w-[100dvw] h-[100dvh] top-0 left-0 z-50" : "relative w-full min-h-96 h-full"} resize-y overflow-auto`}
+          >
+            <LiveKitRoom
+              video={false}
+              audio={false}
+              connect={inCall}
+              token={token}
+              serverUrl={import.meta.env.VITE_PUBLIC_LIVEKIT_URL}
+              data-lk-theme="default"
+              className="flex flex-col h-full"
+              onDisconnected={handleOnDisconnectedFn}
+            >
+              <VideoConference
+                handleOnDisconnectedFn={handleOnDisconnectedFn}
+              />
+              <button
+                className="h-[2dvw] w-[2dvw] p-[1dvw] text-lightly hover:text-white transition-all flex justify-center items-center text-center rounded-xl absolute left-4 bottom-4 md:left-1 md:bottom-1"
+                onClick={() => setFullscreenCall(!fullscreenCall)}
+              >
+                <label className="swap swap-rotate text-white hover:text-secondary ease-in transition-all text-xl">
+                  {fullscreenCall ? (
+                    <div>
+                      <CiMinimize1 />
+                    </div>
+                  ) : (
+                    <div>
+                      <CiMaximize1 />
+                    </div>
+                  )}
+                </label>
+              </button>
+            </LiveKitRoom>
+          </section>
+        )}
         <section
           className={
             "bg-base-200 overflow-y-auto h-full flex flex-col-reverse w-full p-4 gap-4"
