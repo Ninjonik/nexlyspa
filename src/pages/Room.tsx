@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { FullscreenLoading } from "../components/FullscreenLoading.tsx";
 import { useEffect, useRef, useState } from "react";
-import RoomObject, { RoomObjectArray } from "../utils/interfaces/RoomObject.ts";
+import RoomObject from "../utils/interfaces/RoomObject.ts";
 import { useRoomsContext } from "../utils/RoomsContext.tsx";
 import { Textarea } from "../components/Room/TextArea.tsx";
 import MessageObject from "../utils/interfaces/MessageObject.ts";
@@ -26,7 +26,7 @@ export const Room = () => {
   const { user } = useUserContext();
   const { roomId } = useParams();
   const [room, setRoom] = useState<null | RoomObject>(null);
-  const { rooms, setRooms } = useRoomsContext();
+  const { rooms } = useRoomsContext();
   const [messages, setMessages] = useState<MessageObject[]>([]);
   const [optimisticMessages, setOptimisticMessages] = useState<MessageObject[]>(
     [],
@@ -39,29 +39,6 @@ export const Room = () => {
   const [fullscreenCall, setFullscreenCall] = useState<boolean>(false);
 
   const navigate = useNavigate();
-
-  const leaveRoom = async (roomId: string) => {
-    const jwt = await account.createJWT();
-    const result = await functions.createExecution(
-      "leaveRoom",
-      JSON.stringify({
-        jwt: jwt.jwt,
-        roomId: roomId,
-      }),
-      false,
-      undefined,
-      ExecutionMethod.POST,
-    );
-    const response = JSON.parse(result.responseBody);
-    if (response.success && response.status) {
-      if (rooms && Array.from(Object.keys(rooms)).length > 0) {
-        const newRooms: RoomObjectArray = { ...rooms };
-        delete newRooms[roomId];
-        setRooms(newRooms);
-      }
-      navigate("/home");
-    }
-  };
 
   const fetchMessages = async (roomId: string): Promise<void> => {
     const res = await databases.listDocuments(database, "messages", [
@@ -156,7 +133,7 @@ export const Room = () => {
     <section
       className={"grid grid-cols-12 grid-rows-12 w-full h-full overflow-hidden"}
     >
-      <RoomNavbar room={room} onClick={() => leaveRoom(room.$id)} />
+      <RoomNavbar room={room} inCall={inCall} setInCall={setInCall} />
       <section className={"flex flex-col col-span-12 row-span-11"}>
         {inCall && (
           <section

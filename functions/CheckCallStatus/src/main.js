@@ -1,4 +1,4 @@
-import { AccessToken } from "livekit-server-sdk";
+import { RoomServiceClient } from "livekit-server-sdk";
 import { Client, Databases, Account } from "node-appwrite";
 
 export default async ({ req, res }) => {
@@ -60,24 +60,39 @@ export default async ({ req, res }) => {
 
       const apiKey = process.env.LIVEKIT_API_KEY;
       const apiSecret = process.env.LIVEKIT_API_SECRET;
-      // const wsUrl = process.env.LIVEKIT_URL;
+      const wsUrl = process.env.LIVEKIT_URL;
+      const roomService = new RoomServiceClient(wsUrl, apiKey, apiSecret);
 
-      const at = new AccessToken(apiKey, apiSecret, {
-        identity: account.name,
-        name: account.name,
-      });
+      const participants = await roomService.listParticipants(roomId);
 
-      at.addGrant({
-        room: roomId,
-        roomJoin: true,
-        canPublish: true,
-        canSubscribe: true,
-      });
+      let status = true;
+
+      if (participants.length === 0) {
+        console.log(roomId, "participants count is 0");
+        try {
+          await database.updateDocument(
+            process.env.APPWRITE_DATABASE,
+            "rooms",
+            roomId,
+            {
+              call: false,
+            },
+          );
+          status = false;
+        } catch (error) {
+          console.log("Error setting call to false:", error);
+          return res.json({
+            success: false,
+            message: "There has been an error while setting call to false...",
+            status: false,
+          });
+        }
+      }
 
       return res.json({
         success: true,
-        message: "Successfully generated an access token for user.",
-        token: await at.toJwt(),
+        message: "Call has been successfully checked.",
+        newCallStatus: status,
         status: true,
       });
     } catch (err) {

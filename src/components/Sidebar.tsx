@@ -28,7 +28,10 @@ export const Sidebar = () => {
             "text-center flex justify-center items-center text-2xl gap-2"
           }
         >
-          <TbMessages /> Recent Rooms
+          <TbMessages />{" "}
+          <Link to={"/home"} className={"no-underline"}>
+            Recent Rooms
+          </Link>
         </h2>
         {rooms &&
           Array.from(Object.entries(rooms), ([key, room]) => (

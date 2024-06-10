@@ -1,4 +1,3 @@
-import { AccessToken } from "livekit-server-sdk";
 import { Client, Databases, Account } from "node-appwrite";
 
 export default async ({ req, res }) => {
@@ -9,7 +8,7 @@ export default async ({ req, res }) => {
 
   const database = new Databases(client);
 
-  if (req.method === "GET") {
+  if (req.method === "PATCH") {
     const body = JSON.parse(req.body);
     const roomId = body?.roomId;
     const jwt = body?.jwt;
@@ -50,38 +49,34 @@ export default async ({ req, res }) => {
         roomId,
       );
 
-      if (!room || !room.users.some((user) => user.$id === account.$id))
+      if (
+        !room ||
+        (room && room?.call) ||
+        !room.users.some((user) => user.$id === account.$id)
+      )
         return res.json({
-          status: false,
           success: false,
+          status: false,
           message:
-            "Room with the specified room code does exist or user is not in the specified room.",
+            "Room with the specified room code does exist or user is not in the specified room or there is an already ongoing call in the room.",
         });
 
-      const apiKey = process.env.LIVEKIT_API_KEY;
-      const apiSecret = process.env.LIVEKIT_API_SECRET;
-      // const wsUrl = process.env.LIVEKIT_URL;
-
-      const at = new AccessToken(apiKey, apiSecret, {
-        identity: account.name,
-        name: account.name,
-      });
-
-      at.addGrant({
-        room: roomId,
-        roomJoin: true,
-        canPublish: true,
-        canSubscribe: true,
-      });
+      await database.updateDocument(
+        process.env.APPWRITE_DATABASE,
+        "rooms",
+        roomId,
+        {
+          call: true,
+        },
+      );
 
       return res.json({
         success: true,
         message: "Successfully generated an access token for user.",
-        token: await at.toJwt(),
         status: true,
       });
     } catch (err) {
-      console.log(roomId, "doesn't exist");
+      console.info(roomId, "doesn't exist");
       return res.json({
         success: true,
         message: "Room with the specified room code does not exist.",

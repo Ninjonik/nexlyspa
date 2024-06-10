@@ -70,6 +70,7 @@ export const Homepage = () => {
     // Handle the common stuff
     setUser(response.newUser);
     navigate("/room/" + response.roomId);
+    navigate(0);
   };
 
   const [messageJoin, formActionJoin] = useActionState(handleRoomSubmit, null);
