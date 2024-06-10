@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { account } from "../utils/appwrite.ts";
-import { Link, redirect, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 export const Verify = () => {
   const [message, setMessage] = useState<string>("");
@@ -11,6 +11,7 @@ export const Verify = () => {
   const userId = query.get("userId");
   const secret = query.get("secret");
   const expire = query.get("expire");
+  const navigate = useNavigate();
 
   const handleVerify = async () => {
     if (!userId || !secret || !expire) return;
@@ -19,7 +20,7 @@ export const Verify = () => {
 
     try {
       await account.updateVerification(userId, secret);
-      redirect("/home");
+      navigate("/home");
     } catch (e) {
       setMessage(
         "Invalid verification secret or user account or your verification link has already expired. Please request a new one.",
@@ -27,7 +28,7 @@ export const Verify = () => {
     }
 
     setTimeout(() => {
-      redirect("/home");
+      navigate("/home");
     }, 3000);
   };
 
@@ -43,7 +44,7 @@ export const Verify = () => {
     } catch (e) {
       setMessage("You cannot verify already verified or an anonymous account!");
       setTimeout(() => {
-        redirect("/home");
+        navigate("/home");
       }, 3000);
     }
   };

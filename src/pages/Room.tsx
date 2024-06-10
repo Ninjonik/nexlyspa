@@ -1,4 +1,4 @@
-import { redirect, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { FullscreenLoading } from "../components/FullscreenLoading.tsx";
 import { useEffect, useRef, useState } from "react";
 import RoomObject, { RoomObjectArray } from "../utils/interfaces/RoomObject.ts";
@@ -33,6 +33,7 @@ export const Room = () => {
   );
   const optimisticMessagesRef = useRef<MessageObject[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const navigate = useNavigate();
 
   const leaveRoom = async (roomId: string) => {
     const jwt = await account.createJWT();
@@ -54,7 +55,7 @@ export const Room = () => {
         delete newRooms[roomId];
         setRooms(newRooms);
       }
-      redirect("/home");
+      navigate("/home");
     }
   };
 
@@ -111,7 +112,7 @@ export const Room = () => {
   if (loading) return <RoomSkeleton />;
 
   if (!roomId) {
-    redirect("/home");
+    navigate("/home");
     return <FullscreenLoading />;
   }
 
