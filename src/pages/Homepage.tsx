@@ -34,14 +34,13 @@ export const Homepage = () => {
         "joinRoom",
         JSON.stringify({
           jwt: jwt.jwt,
-          roomCode: code,
+          roomId: code,
         }),
         false,
         undefined,
         ExecutionMethod.POST,
       );
       response = JSON.parse(result.responseBody);
-      console.log(result, response);
       if (!response.success || !response.status)
         return handleReturn(
           response?.message ?? "An unknown error has happened.",
@@ -70,7 +69,7 @@ export const Homepage = () => {
 
     // Handle the common stuff
     setUser(response.newUser);
-    navigate("/room/" + response.roomCode);
+    navigate("/room/" + response.roomId);
   };
 
   const [messageJoin, formActionJoin] = useActionState(handleRoomSubmit, null);

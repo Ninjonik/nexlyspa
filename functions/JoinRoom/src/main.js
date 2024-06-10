@@ -26,9 +26,9 @@ export default async ({ req, res }) => {
   if (req.method === "POST") {
     const body = JSON.parse(req.body);
     const jwt = body?.jwt;
-    const roomCode = body?.roomCode;
+    const roomId = body?.roomId;
 
-    if (!jwt || !roomCode)
+    if (!jwt || !roomId)
       return res.json({
         success: false,
         message: "Some of the required parameters is missing.",
@@ -56,7 +56,7 @@ export default async ({ req, res }) => {
       const result = await functions.createExecution(
         "checkRoom",
         JSON.stringify({
-          roomId: roomCode,
+          roomId: roomId,
         }),
         false,
         undefined,
@@ -75,7 +75,7 @@ export default async ({ req, res }) => {
       const roomData = await database.getDocument(
         process.env.APPWRITE_DATABASE,
         "rooms",
-        roomCode,
+        roomId,
       );
 
       const newRoomUsers = roomData?.users
@@ -90,7 +90,7 @@ export default async ({ req, res }) => {
       const newRoom = await database.updateDocument(
         process.env.APPWRITE_DATABASE,
         "rooms",
-        roomCode,
+        roomId,
         {
           users: newRoomUsers,
         },
@@ -102,7 +102,7 @@ export default async ({ req, res }) => {
           success: true,
           message: "Successfully joined a new room!",
           newRoom: newRoom,
-          roomCode: roomCode,
+          roomId: roomId,
         });
       }
       return res.json({
@@ -110,7 +110,7 @@ export default async ({ req, res }) => {
         message: "Unknown error.",
       });
     } catch (err) {
-      console.log(err);
+      console.info(err);
       return res.json({
         success: true,
         message: "Cannot join the room with the specified arguments...",

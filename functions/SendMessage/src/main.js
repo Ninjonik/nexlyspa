@@ -91,15 +91,13 @@ export default async ({ req, res }) => {
         permissions,
       );
 
-      console.log("RESULT:", result);
-
       return res.json({
         success: false,
         message: "Message successfully sent!",
         data: result,
       });
     } catch (error) {
-      console.log("Error creating a message:", error);
+      console.info("Error creating a message:", error);
       return res.json({
         success: false,
         message: "There has been an error while processing your request",
