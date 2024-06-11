@@ -1,1 +1,1 @@
-# Nexly V3
+# Nexly V3 - Built with React and Tauri
