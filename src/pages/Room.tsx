@@ -110,8 +110,9 @@ export const Room = () => {
         `databases.${database}.collections.messages.documents`,
         (response) => {
           const payload = response.payload as MessageObject;
+          console.info("NEW MESSAGE:", payload.author.name, payload.message);
           const messageRoomId = payload.room.$id;
-          if (messageRoomId === room.$id && user)
+          if (messageRoomId === room.$id) {
             if (
               payload.author.$id === user.$id &&
               optimisticMessagesRef.current.length > 0
@@ -120,7 +121,10 @@ export const Room = () => {
               newOptimisticMessages.pop();
               setOptimisticMessages(newOptimisticMessages);
             }
-          setMessages((prevMessages) => [payload, ...prevMessages]);
+            // setOptimisticMessages([]);
+            setMessages((prevMessages) => [payload, ...prevMessages]);
+          }
+          console.log(messages, optimisticMessages);
         },
       );
 
