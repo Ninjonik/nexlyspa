@@ -112,7 +112,7 @@ export const Room = () => {
           const payload = response.payload as MessageObject;
           console.info("NEW MESSAGE:", payload.author.name, payload.message);
           const messageRoomId = payload.room.$id;
-          if (messageRoomId === room.$id) {
+          if (messageRoomId === room.$id && user) {
             if (
               payload.author.$id === user.$id &&
               optimisticMessagesRef.current.length > 0
