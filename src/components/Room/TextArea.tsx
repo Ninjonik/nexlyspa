@@ -280,7 +280,7 @@ export const Textarea = ({
                 tenorApiKey={
                   import.meta.env.VITE_PUBLIC_TENOR_KEY || "no_tenor_api_key"
                 }
-                // onGifClick={(e: { url: string }) => handleSubmit(e.url)}
+                onGifClick={(e: { url: string }) => submitAction(e.url, attachments)}
               />
             }
             trigger={"click"}
