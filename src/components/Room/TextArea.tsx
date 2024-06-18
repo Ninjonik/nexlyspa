@@ -104,8 +104,8 @@ export const Textarea = ({
       setOptimisticMessages((prevMessages: MessageObject[]) => [
         {
           $id: "optimistic_message_" + new Date().toISOString(),
-          $createdAt: new Date().toLocaleDateString(),
-          $updatedAt: new Date().toLocaleDateString(),
+          $createdAt: new Date().toISOString(),
+          $updatedAt: new Date().toISOString(),
           $permissions: [],
           author: user,
           room: room,
