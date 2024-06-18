@@ -5,7 +5,7 @@ import React, {
   useState,
   useRef,
   SetStateAction,
-  Dispatch,
+  Dispatch, RefObject,
 } from "react";
 import { FaPlus } from "react-icons/fa";
 import {
@@ -30,12 +30,14 @@ interface TextareaProps {
   className?: string;
   room: RoomObject;
   setOptimisticMessages: Dispatch<SetStateAction<MessageObject[]>>;
+  messagesSectionRef: RefObject<HTMLDivElement>;
 }
 
 export const Textarea = ({
   className,
   room,
   setOptimisticMessages,
+  messagesSectionRef,
 }: TextareaProps) => {
   const [text, setText] = useState<string>("");
   const [attachments, setAttachments] = useState<File[]>([]);
@@ -114,6 +116,7 @@ export const Textarea = ({
         },
         ...prevMessages,
       ]);
+      messagesSectionRef.current?.scrollTo(0,0);
       submitAction(message, attachments);
     }
   };

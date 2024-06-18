@@ -35,6 +35,7 @@ export const Room = () => {
   const [token, setToken] = useState<string>("");
   const [inCall, setInCall] = useState<boolean>(false);
   const [fullscreenCall, setFullscreenCall] = useState<boolean>(false);
+  const messagesSectionRef = useRef<HTMLDivElement>(null);
 
   const navigate = useNavigate();
 
@@ -195,6 +196,7 @@ export const Room = () => {
           className={
             "bg-base-200 overflow-y-auto h-full flex flex-col-reverse w-full p-4 gap-4"
           }
+          ref={messagesSectionRef}
         >
           {optimisticMessages.map((message: MessageObject) => (
             <Message key={message.$id} message={message} />
@@ -206,7 +208,7 @@ export const Room = () => {
           </PhotoProvider>
         </section>
         <footer className={"w-full p-2 bg-base-200"}>
-          <Textarea room={room} setOptimisticMessages={setOptimisticMessages} />
+          <Textarea room={room} setOptimisticMessages={setOptimisticMessages} messagesSectionRef={messagesSectionRef} />
         </footer>
       </section>
     </section>

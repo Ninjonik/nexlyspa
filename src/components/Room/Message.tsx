@@ -6,6 +6,10 @@ import React, { useEffect, useState } from "react";
 import getFileData, { getFileDataResult } from "../../utils/getFileData.ts";
 import formatTimestampToDate from "../../utils/formatTimestampToDate.ts";
 import formatTimestampToTime from "../../utils/formatTimestampToTime.ts";
+import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeHighlight from "rehype-highlight";
+import Twemoji from 'react-twemoji';
 
 interface MessageInterface {
   message: MessageObject;
@@ -69,12 +73,10 @@ export const Message = ({ message }: MessageInterface) => {
             </span>
           </h4>
         </div>
-        <h4
-          className={`${own ? "bg-primary rounded-l-lg text-white" : "bg-base-100 rounded-r-lg text-base-content"} rounded-b-lg p-1`}
-        >
-          {message.message}
-        </h4>
-        <MemoizedAttachmentList attachmentsData={attachmentsData} own={own} />
+          <div className={`${own ? "bg-primary rounded-l-lg text-white" : "bg-base-300 rounded-r-lg text-base-content"} rounded-b-lg p-1 whitespace-pre-line`}>
+            <Twemoji options={{className: 'twemoji'}}><Markdown rehypePlugins={[rehypeHighlight]} remarkPlugins={[remarkGfm]}>{message.message}</Markdown></Twemoji>
+          </div>
+        <MemoizedAttachmentList attachmentsData={attachmentsData} own={own}/>
       </div>
     </div>
   );
