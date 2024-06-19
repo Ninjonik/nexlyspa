@@ -29,7 +29,7 @@ const generateUniqueroomId = async (functions) => {
     );
 
     const response = JSON.parse(result.responseBody);
-    if (!response.success || !response.status) {
+    if (!response.success) {
       /* Code does not exist, so end the loop */
       codeExists = false;
       continue;
@@ -139,7 +139,7 @@ export default async ({ req, res }) => {
     } catch (err) {
       console.log(err);
       return res.json({
-        success: true,
+        success: false,
         message: "Cannot create a room with specified arguments...",
       });
     }

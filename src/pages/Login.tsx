@@ -6,6 +6,7 @@ import { useActionState } from "react";
 import { account } from "../utils/appwrite.ts";
 import { useUserContext } from "../utils/UserContext.tsx";
 import { UserAuthObject } from "../utils/interfaces/UserObject.ts";
+import { toast } from "react-toastify";
 
 export const Login = () => {
   const { getUserData, logoutUser } = useUserContext();
@@ -16,13 +17,16 @@ export const Login = () => {
     const password = queryData.get("password") as string;
     if (!email || !password) return "Please fill all the fields.";
 
+    const toastId = toast.loading("Logging you in...");
     await logoutUser();
     try {
       await account.createEmailPasswordSession(email, password);
       const newAccount = (await account.get()) as UserAuthObject;
       await getUserData(newAccount);
+      toast.update(toastId, {render: "Successfully logged you in!", type: "success", isLoading: false, autoClose: 2000});
       navigate("/home");
     } catch (e) {
+      toast.update(toastId, {render: "Invalid email/password.", type: "error", isLoading: false, autoClose: 2000});
       return "Invalid email/password.";
     }
   };

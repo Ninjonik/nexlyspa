@@ -3,6 +3,10 @@ import {Account, Client, Functions, Databases, Storage, Avatars} from 'appwrite'
 const appwriteEndpoint = import.meta.env.VITE_PUBLIC_APPWRITE_ENDPOINT;
 const appwriteProject = import.meta.env.VITE_PUBLIC_APPWRITE_PROJECT;
 
+console.info("ENDPOINT:", appwriteEndpoint)
+console.info("PROJECT:", appwriteProject)
+// TODO: remove, for debugging purposes only
+
 export const client = new Client();
 export const databases = new Databases(client);
 export const functions = new Functions(client)

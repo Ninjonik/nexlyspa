@@ -35,6 +35,7 @@ export const Room = () => {
   const [token, setToken] = useState<string>("");
   const [inCall, setInCall] = useState<boolean>(false);
   const [fullscreenCall, setFullscreenCall] = useState<boolean>(false);
+  const messagesSectionRef = useRef<HTMLDivElement>(null);
 
   const navigate = useNavigate();
 
@@ -68,7 +69,7 @@ export const Room = () => {
         );
         const response = JSON.parse(result.responseBody);
         console.log(result, response);
-        if (!response.success || !response.status)
+        if (!response.success)
           return "Failed to create a call token.";
 
         setToken(response.token);
@@ -110,8 +111,9 @@ export const Room = () => {
         `databases.${database}.collections.messages.documents`,
         (response) => {
           const payload = response.payload as MessageObject;
+          console.info("NEW MESSAGE:", payload.author.name, payload.message);
           const messageRoomId = payload.room.$id;
-          if (messageRoomId === room.$id && user)
+          if (messageRoomId === room.$id && user) {
             if (
               payload.author.$id === user.$id &&
               optimisticMessagesRef.current.length > 0
@@ -120,7 +122,10 @@ export const Room = () => {
               newOptimisticMessages.pop();
               setOptimisticMessages(newOptimisticMessages);
             }
-          setMessages((prevMessages) => [payload, ...prevMessages]);
+            // setOptimisticMessages([]);
+            setMessages((prevMessages) => [payload, ...prevMessages]);
+          }
+          console.log(messages, optimisticMessages);
         },
       );
 
@@ -169,7 +174,7 @@ export const Room = () => {
                 handleOnDisconnectedFn={handleOnDisconnectedFn}
               />
               <button
-                className="h-[2dvw] w-[2dvw] p-[1dvw] text-lightly hover:text-white transition-all flex justify-center items-center text-center rounded-xl absolute left-4 bottom-4 md:left-1 md:bottom-1"
+                className="bg-transparent hover:bg-transparent border-none h-[2dvw] w-[2dvw] p-[1dvw] text-lightly hover:text-white transition-all flex justify-center items-center text-center rounded-xl absolute left-4 bottom-4 md:left-1 md:bottom-1"
                 onClick={() => setFullscreenCall(!fullscreenCall)}
               >
                 <label className="swap swap-rotate text-white hover:text-secondary ease-in transition-all text-xl">
@@ -191,6 +196,7 @@ export const Room = () => {
           className={
             "bg-base-200 overflow-y-auto h-full flex flex-col-reverse w-full p-4 gap-4"
           }
+          ref={messagesSectionRef}
         >
           {optimisticMessages.map((message: MessageObject) => (
             <Message key={message.$id} message={message} />
@@ -202,7 +208,7 @@ export const Room = () => {
           </PhotoProvider>
         </section>
         <footer className={"w-full p-2 bg-base-200"}>
-          <Textarea room={room} setOptimisticMessages={setOptimisticMessages} />
+          <Textarea room={room} setOptimisticMessages={setOptimisticMessages} messagesSectionRef={messagesSectionRef} />
         </footer>
       </section>
     </section>

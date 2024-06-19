@@ -64,7 +64,7 @@ export default async ({ req, res }) => {
       );
 
       const response = JSON.parse(result.responseBody);
-      if (!response.success || !response.status) {
+      if (!response.success) {
         return res.json({
           success: false,
           message:
@@ -112,7 +112,7 @@ export default async ({ req, res }) => {
     } catch (err) {
       console.info(err);
       return res.json({
-        success: true,
+        success: false,
         message: "Cannot join the room with the specified arguments...",
       });
     }

@@ -4,6 +4,7 @@ import { account, functions } from "../utils/appwrite.ts";
 import { ExecutionMethod } from "appwrite";
 import { useUserContext } from "../utils/UserContext.tsx";
 import { useNavigate } from "react-router-dom";
+import {toast, Id} from "react-toastify";
 
 export const Homepage = () => {
   const [pending, setPending] = useState<boolean>(false);
@@ -16,8 +17,9 @@ export const Homepage = () => {
     const description = queryData.get("description");
     const code = queryData.get("code");
 
-    const handleReturn = (message: string) => {
+    const handleReturn = (message: string, toastId: Id) => {
       setPending(false);
+      toast.update(toastId, {render: message, type: "error", isLoading: false, autoClose: 2000});
       return message;
     };
 
@@ -27,7 +29,8 @@ export const Homepage = () => {
 
     if (code) {
       // Handle joining a room
-      if (!code) return handleReturn("Please enter a valid code.");
+      const toastId = toast.loading("Joining a room...");
+      if (!code) return handleReturn("Please enter a valid code.", toastId);
 
       // Validate room's code
       const result = await functions.createExecution(
@@ -41,14 +44,15 @@ export const Homepage = () => {
         ExecutionMethod.POST,
       );
       response = JSON.parse(result.responseBody);
-      if (!response.success || !response.status)
-        return handleReturn(
-          response?.message ?? "An unknown error has happened.",
-        );
+      if (!response.success)
+        return handleReturn(response?.message ?? "An unknown error has happened.", toastId);
+
+      toast.update(toastId, {render: "Successfully joined a new room", type: "success", isLoading: false, autoClose: 2000});
     } else {
       // Handle creating a room
+      const toastId = toast.loading("Creating a room...");
       if (!name || !description)
-        return handleReturn("Please fill all the fields.");
+        return handleReturn("Please fill all the fields.", toastId);
 
       const result = await functions.createExecution(
         "createRoom",
@@ -64,13 +68,14 @@ export const Homepage = () => {
       );
       response = JSON.parse(result.responseBody);
       if (!response.success)
-        return handleReturn("Room with the specified code does not exist.");
+        return handleReturn("Room with the specified code does not exist.", toastId);
+
+      toast.update(toastId, {render: "Successfully created a new room", type: "success", isLoading: false, autoClose: 2000});
     }
 
     // Handle the common stuff
     setUser(response.newUser);
     navigate("/room/" + response.roomId);
-    navigate(0);
   };
 
   const [messageJoin, formActionJoin] = useActionState(handleRoomSubmit, null);

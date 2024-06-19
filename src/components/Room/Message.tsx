@@ -6,6 +6,12 @@ import React, { useEffect, useState } from "react";
 import getFileData, { getFileDataResult } from "../../utils/getFileData.ts";
 import formatTimestampToDate from "../../utils/formatTimestampToDate.ts";
 import formatTimestampToTime from "../../utils/formatTimestampToTime.ts";
+import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeHighlight from "rehype-highlight";
+import Twemoji from 'react-twemoji';
+import {PhotoView} from "react-photo-view";
+import {isValidImageUrl} from "../../utils/isValidImageUrl.ts";
 
 interface MessageInterface {
   message: MessageObject;
@@ -48,6 +54,9 @@ export const Message = ({ message }: MessageInterface) => {
     "text-base-content",
   ];
   if (!_classes) return;
+
+  let validImageUrl = false;
+  if(message?.message) validImageUrl = isValidImageUrl(message.message);
   return (
     <div
       className={`max-w-2/3 flex flex-row gap-4 ${own && "place-self-end"} ${message.$collectionId === "TEMPORARY" && "opacity-50"}`}
@@ -69,13 +78,28 @@ export const Message = ({ message }: MessageInterface) => {
             </span>
           </h4>
         </div>
-        <h4
-          className={`${own ? "bg-primary rounded-l-lg text-white" : "bg-base-100 rounded-r-lg text-base-content"} rounded-b-lg p-1`}
-        >
-          {message.message}
-        </h4>
-        <MemoizedAttachmentList attachmentsData={attachmentsData} own={own} />
+        {(message.message && validImageUrl) ? (
+        <div>
+          <PhotoView src={message.message}>
+            <img
+                className={`rounded-b-lg ease-in object-fit ${own ? "rounded-l-md bg-primary text-base-100" : "rounded-r-md bg-base-300 text-left"}`}
+                alt={"Imported message image"}
+                src={message.message}
+            />
+          </PhotoView>
+        </div>
+        ) : (
+            <>
+              <div
+                  className={`${own ? "rounded-l-lg bg-primary text-base-100" : "rounded-r-lg bg-base-300 text-left"} rounded-b-lg w-full p-1 whitespace-pre-line`}>
+                <Twemoji options={{className: 'tw-emoji'}}><Markdown rehypePlugins={[rehypeHighlight]}
+                                                                    remarkPlugins={[remarkGfm]}>{message.message}</Markdown></Twemoji>
+              </div>
+              <MemoizedAttachmentList attachmentsData={attachmentsData} own={own}/>
+            </>
+        )}
       </div>
+
     </div>
   );
 };

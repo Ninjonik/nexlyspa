@@ -5,7 +5,7 @@ import React, {
   useState,
   useRef,
   SetStateAction,
-  Dispatch,
+  Dispatch, RefObject,
 } from "react";
 import { FaPlus } from "react-icons/fa";
 import {
@@ -30,12 +30,14 @@ interface TextareaProps {
   className?: string;
   room: RoomObject;
   setOptimisticMessages: Dispatch<SetStateAction<MessageObject[]>>;
+  messagesSectionRef: RefObject<HTMLDivElement>;
 }
 
 export const Textarea = ({
   className,
   room,
   setOptimisticMessages,
+  messagesSectionRef,
 }: TextareaProps) => {
   const [text, setText] = useState<string>("");
   const [attachments, setAttachments] = useState<File[]>([]);
@@ -102,8 +104,8 @@ export const Textarea = ({
       setOptimisticMessages((prevMessages: MessageObject[]) => [
         {
           $id: "optimistic_message_" + new Date().toISOString(),
-          $createdAt: new Date().toLocaleDateString(),
-          $updatedAt: new Date().toLocaleDateString(),
+          $createdAt: new Date().toISOString(),
+          $updatedAt: new Date().toISOString(),
           $permissions: [],
           author: user,
           room: room,
@@ -114,6 +116,7 @@ export const Textarea = ({
         },
         ...prevMessages,
       ]);
+      messagesSectionRef.current?.scrollTo(0,0);
       submitAction(message, attachments);
     }
   };
@@ -277,7 +280,7 @@ export const Textarea = ({
                 tenorApiKey={
                   import.meta.env.VITE_PUBLIC_TENOR_KEY || "no_tenor_api_key"
                 }
-                // onGifClick={(e: { url: string }) => handleSubmit(e.url)}
+                onGifClick={(e: { url: string }) => submitAction(e.url, attachments)}
               />
             }
             trigger={"click"}
