@@ -56,7 +56,6 @@ export default async ({ req, res }) => {
       )
         return res.json({
           success: false,
-          status: false,
           message:
             "Room with the specified room code does exist or user is not in the specified room or there is an already ongoing call in the room.",
         });
@@ -73,14 +72,12 @@ export default async ({ req, res }) => {
       return res.json({
         success: true,
         message: "Successfully generated an access token for user.",
-        status: true,
       });
     } catch (err) {
       console.info(roomId, "doesn't exist");
       return res.json({
-        success: true,
+        success: false,
         message: "Room with the specified room code does not exist.",
-        status: false,
       });
     }
   }

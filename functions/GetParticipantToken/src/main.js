@@ -52,7 +52,6 @@ export default async ({ req, res }) => {
 
       if (!room || !room.users.some((user) => user.$id === account.$id))
         return res.json({
-          status: false,
           success: false,
           message:
             "Room with the specified room code does exist or user is not in the specified room.",
@@ -78,14 +77,12 @@ export default async ({ req, res }) => {
         success: true,
         message: "Successfully generated an access token for user.",
         token: await at.toJwt(),
-        status: true,
       });
     } catch (err) {
       console.log(roomId, "doesn't exist");
       return res.json({
-        success: true,
+        success: false,
         message: "Room with the specified room code does not exist.",
-        status: false,
       });
     }
   }

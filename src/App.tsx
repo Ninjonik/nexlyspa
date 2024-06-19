@@ -4,6 +4,7 @@ import RoutesList from "./RoutesList.tsx";
 import { UserContextProvider } from "./utils/UserContext.tsx";
 import {RoomsContextProvider} from "./utils/RoomsContext.tsx";
 import '@livekit/components-styles';
+import {ToastContainer} from "react-toastify";
 
 export const routeTransition = {
   initial: {
@@ -21,6 +22,7 @@ function App() {
         <RoomsContextProvider>
           <ClientWrapper>
             <RoutesList />
+            <ToastContainer />
           </ClientWrapper>
         </RoomsContextProvider>
       </UserContextProvider>

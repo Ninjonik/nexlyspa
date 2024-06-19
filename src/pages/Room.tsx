@@ -69,7 +69,7 @@ export const Room = () => {
         );
         const response = JSON.parse(result.responseBody);
         console.log(result, response);
-        if (!response.success || !response.status)
+        if (!response.success)
           return "Failed to create a call token.";
 
         setToken(response.token);

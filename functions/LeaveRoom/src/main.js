@@ -99,7 +99,7 @@ export default async ({ req, res }) => {
       if (newRoom) {
         return res.json({
           success: true,
-          message: "Successfully joined a new room!",
+          message: "Successfully left the new room.",
           newRoom: newRoom,
           roomId: roomId,
         });
@@ -111,8 +111,8 @@ export default async ({ req, res }) => {
     } catch (err) {
       console.info(err);
       return res.json({
-        success: true,
-        message: "Cannot join the room with the specified arguments...",
+        success: false,
+        message: "Cannot leave the room with the specified arguments...",
       });
     }
   }

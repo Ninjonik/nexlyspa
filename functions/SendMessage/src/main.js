@@ -92,7 +92,7 @@ export default async ({ req, res }) => {
       );
 
       return res.json({
-        success: false,
+        success: true,
         message: "Message successfully sent!",
         data: result,
       });
