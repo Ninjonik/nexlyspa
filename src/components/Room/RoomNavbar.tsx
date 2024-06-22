@@ -12,7 +12,7 @@ import { useRoomsContext } from "../../utils/RoomsContext.tsx";
 import { Dispatch, SetStateAction } from "react";
 import { ImPhoneHangUp } from "react-icons/im";
 import { TbPhonePlus } from "react-icons/tb";
-import {toast} from "react-toastify";
+import { toast } from "react-toastify";
 
 interface RoomNavbarProps {
   room: RoomObject;
@@ -29,9 +29,10 @@ export default function RoomNavbar({
   const { rooms, setRooms } = useRoomsContext();
 
   const leaveRoom = async (roomId: string) => {
-    const toastId = toast.loading("Leaving the room...")
+    const toastId = toast.loading("Leaving the room...");
+
     const jwt = await account.createJWT();
-    const result = await functions.createExecution(
+    functions.createExecution(
       "leaveRoom",
       JSON.stringify({
         jwt: jwt.jwt,
@@ -41,21 +42,21 @@ export default function RoomNavbar({
       undefined,
       ExecutionMethod.POST,
     );
-    const response = JSON.parse(result.responseBody);
-    console.log("RESPONSE:", response)
-    if (response.success && response) {
-      if (rooms && Array.from(Object.keys(rooms)).length > 0) {
-        const newRooms: RoomObjectArray = { ...rooms };
-        delete newRooms[roomId];
-        console.log("OLD ROOMS BEFORE LEAVING:", rooms, roomId)
-        console.log("NEW ROOMS AFTER LEAVING: ", newRooms)
-        setRooms(newRooms);
-      }
-      toast.update(toastId, {render: "Successfully left the room.", type: "success", isLoading: false, autoClose: 2000});
-      navigate("/home");
-    } else {
-      toast.update(toastId, {render: "Cannot leave the room...", type: "error", isLoading: false, autoClose: 2000});
+
+    if (rooms && Array.from(Object.keys(rooms)).length > 0) {
+      const newRooms: RoomObjectArray = { ...rooms };
+      delete newRooms[roomId];
+      console.log("OLD ROOMS BEFORE LEAVING:", rooms, roomId);
+      console.log("NEW ROOMS AFTER LEAVING: ", newRooms);
+      setRooms(newRooms);
     }
+    toast.update(toastId, {
+      render: "Successfully left the room.",
+      type: "success",
+      isLoading: false,
+      autoClose: 2000,
+    });
+    navigate("/home");
   };
 
   const startACall = async (roomId: string) => {
@@ -73,8 +74,7 @@ export default function RoomNavbar({
       );
       const response = JSON.parse(result.responseBody);
       console.log(result, response);
-      if (!response.success)
-        return "Failed to call the room.";
+      if (!response.success) return "Failed to call the room.";
       setInCall(true);
     } catch (e) {
       console.info(e);
