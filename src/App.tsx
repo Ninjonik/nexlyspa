@@ -2,9 +2,10 @@ import { ClientWrapper } from "./ClientWrapper.tsx";
 import { BrowserRouter } from "react-router-dom";
 import RoutesList from "./RoutesList.tsx";
 import { UserContextProvider } from "./utils/UserContext.tsx";
-import {RoomsContextProvider} from "./utils/RoomsContext.tsx";
-import '@livekit/components-styles';
-import {ToastContainer} from "react-toastify";
+import { RoomsContextProvider } from "./utils/RoomsContext.tsx";
+import "@livekit/components-styles";
+import { ToastContainer } from "react-toastify";
+import { SlideContextProvider } from "./utils/SlideContext.tsx";
 
 export const routeTransition = {
   initial: {
@@ -21,8 +22,10 @@ function App() {
       <UserContextProvider>
         <RoomsContextProvider>
           <ClientWrapper>
-            <RoutesList />
-            <ToastContainer />
+            <SlideContextProvider>
+              <RoutesList />
+              <ToastContainer />
+            </SlideContextProvider>
           </ClientWrapper>
         </RoomsContextProvider>
       </UserContextProvider>

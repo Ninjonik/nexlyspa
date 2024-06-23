@@ -7,8 +7,11 @@ import { useUserContext } from "../utils/UserContext.tsx";
 import { FullscreenLoading } from "./FullscreenLoading.tsx";
 import { RoomListItem } from "./sidebar/RoomListItem.tsx";
 import { useRoomsContext } from "../utils/RoomsContext.tsx";
+import { useSlideContext } from "../utils/SlideContext.tsx";
+import { RiArrowDropDownLine } from "react-icons/ri";
 
 export const Sidebar = () => {
+  const { slide, onTouchStart, onTouchMove, onTouchEnd } = useSlideContext();
   const { user } = useUserContext();
   const { rooms } = useRoomsContext();
 
@@ -16,9 +19,10 @@ export const Sidebar = () => {
 
   return (
     <aside
-      className={
-        "w-full md:w-1/4 bg-base-100 h-full overflow-hidden flex flex-col justify-between pt-4"
-      }
+      className={`bg-base-100 h-full overflow-hidden flex flex-col justify-between pt-4 md:w-1/5 ${slide === "sidebar" ? "w-full" : "hidden"}`}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
     >
       <section
         className={"flex flex-col w-full h-full overflow-y-auto gap-4 px-8"}
@@ -38,7 +42,7 @@ export const Sidebar = () => {
             <RoomListItem key={key + "_rli"} room={room} />
           ))}
       </section>
-      <section className={"flex flex-row p-2 h-24"}>
+      <section className={"flex flex-row p-2 h-24 items-center justify-center"}>
         <div className={"flex flex-row w-full gap-4 justify-between"}>
           <div className={"flex flex-row gap-4 w-2/3 items-center"}>
             <Avatar />
@@ -51,7 +55,49 @@ export const Sidebar = () => {
               <h4>{user.emailVerification ? "Verified" : "Not verified"}</h4>
             </div>
           </div>
-          <div className={"flex flex-row gap-4 justify-end items-center w-1/3"}>
+
+          <div className="dropdown dropdown-left dropdown-top hidden sm:flex lg:hidden justify-center items-center">
+            <a tabIndex={0} role="button" className="m-1 text-4xl">
+              <RiArrowDropDownLine />
+            </a>
+            <ul
+              tabIndex={0}
+              className="dropdown-content z-50 menu p-2 shadow bg-base-100 rounded-box"
+            >
+              <li>
+                <Link
+                  to={"/register/verify"}
+                  className={"font-bold text-xl"}
+                  title={"Verify your account"}
+                >
+                  <IoMdCheckmarkCircle />
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to={"/logout"}
+                  className={"font-bold text-xl"}
+                  title={"Settings"}
+                >
+                  <FaGear />
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to={"/logout"}
+                  className={"font-bold text-xl"}
+                  title={"Log out"}
+                >
+                  <TbLogout2 />
+                </Link>
+              </li>
+            </ul>
+          </div>
+          <div
+            className={
+              "flex sm:hidden lg:flex flex-row gap-4 justify-end items-center w-1/3"
+            }
+          >
             <Link
               to={"/register/verify"}
               className={"font-bold text-xl"}

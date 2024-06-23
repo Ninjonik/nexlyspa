@@ -20,6 +20,7 @@ import RoomNavbar from "../components/Room/RoomNavbar.tsx";
 import { LiveKitRoom } from "@livekit/components-react";
 import VideoConference from "../components/Room/VideoConference.tsx";
 import { CiMaximize1, CiMinimize1 } from "react-icons/ci";
+import { useSlideContext } from "../utils/SlideContext.tsx";
 
 export const Room = () => {
   const { user } = useUserContext();
@@ -36,6 +37,8 @@ export const Room = () => {
   const [inCall, setInCall] = useState<boolean>(false);
   const [fullscreenCall, setFullscreenCall] = useState<boolean>(false);
   const messagesSectionRef = useRef<HTMLDivElement>(null);
+
+  const { slide, onTouchStart, onTouchMove, onTouchEnd } = useSlideContext();
 
   const navigate = useNavigate();
 
@@ -69,8 +72,7 @@ export const Room = () => {
         );
         const response = JSON.parse(result.responseBody);
         console.log(result, response);
-        if (!response.success)
-          return "Failed to create a call token.";
+        if (!response.success) return "Failed to create a call token.";
 
         setToken(response.token);
       } catch (e) {
@@ -152,7 +154,10 @@ export const Room = () => {
 
   return (
     <section
-      className={"grid grid-cols-12 grid-rows-12 w-full h-full overflow-hidden"}
+      className={`grid grid-cols-12 grid-rows-12 w-full h-full overflow-hidden ${slide === "main" ? "" : "hidden"}`}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
     >
       <RoomNavbar room={room} inCall={inCall} setInCall={setInCall} />
       <section className={"flex flex-col col-span-12 row-span-11"}>
@@ -208,7 +213,11 @@ export const Room = () => {
           </PhotoProvider>
         </section>
         <footer className={"w-full p-2 bg-base-200"}>
-          <Textarea room={room} setOptimisticMessages={setOptimisticMessages} messagesSectionRef={messagesSectionRef} />
+          <Textarea
+            room={room}
+            setOptimisticMessages={setOptimisticMessages}
+            messagesSectionRef={messagesSectionRef}
+          />
         </footer>
       </section>
     </section>
