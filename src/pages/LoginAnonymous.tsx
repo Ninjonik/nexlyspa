@@ -36,7 +36,7 @@ export const LoginAnonymous = () => {
           "h-full md:h-auto md:w-auto p-8 flex flex-col justify-center items-center bg-base-100 rounded-lg shadow-md text-center gap-4"
         }
       >
-        <h2>Welcome!</h2>
+        <h2>Welcome to Nexly!</h2>
         <h3>
           We respect your privacy and that's <br />
           why having a temporary anonymous <br />
