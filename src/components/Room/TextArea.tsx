@@ -107,7 +107,10 @@ export const Textarea = ({
     if (user && message) {
       setOptimisticMessages((prevMessages: MessageObject[]) => [
         {
-          $id: "optimistic_message_" + new Date().toISOString(),
+          $id:
+            "optimistic_message_" +
+            new Date().toISOString() +
+            Math.floor(Math.random() * 5000000),
           $createdAt: new Date().toISOString(),
           $updatedAt: new Date().toISOString(),
           $permissions: [],

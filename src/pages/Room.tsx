@@ -90,6 +90,13 @@ export const Room = () => {
       setRoom(res as RoomObject);
     };
 
+    setRoom(null);
+    setOptimisticMessages([]);
+    optimisticMessagesRef.current = [];
+    setMessages([]);
+    setInCall(false);
+    setToken("");
+    setFullscreenCall(false);
     fetchRoomData();
     fetchMessages(roomId);
 

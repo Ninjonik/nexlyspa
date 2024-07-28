@@ -13,6 +13,7 @@
   "dependencies": {
     "@livekit/components-react": "^2.3.2",
     "@livekit/components-styles": "^1.0.12",
+    "@tauri-apps/api": "^1.6.0",
     "@tippyjs/react": "^4.2.6",
     "@types/react": "npm:types-react@rc",
     "@types/react-dom": "npm:types-react-dom@rc",
