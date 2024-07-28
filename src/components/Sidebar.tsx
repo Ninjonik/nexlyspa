@@ -19,7 +19,7 @@ export const Sidebar = () => {
 
   return (
     <aside
-      className={`bg-base-100 h-full overflow-hidden flex flex-col justify-between pt-4 md:w-1/5 ${slide === "sidebar" ? "w-full" : "hidden"}`}
+      className={`bg-base-100 h-full overflow-hidden flex flex-col justify-between pt-4 md:w-1/5 ${slide === "sidebar" ? "w-full" : "_md:hidden"}`}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}

@@ -113,7 +113,7 @@ export const Homepage = () => {
   console.info(pending);
   return (
     <section
-      className={`md:visible h-full bg-base-200 flex flex-col gap-8 md:w-4/5 md:p-8 ${slide === "main" ? "w-full p-8" : "hidden p-0"}`}
+      className={`md:visible h-full bg-base-200 flex flex-col gap-8 md:w-4/5 md:p-8 ${slide === "main" ? "w-full p-8" : "_md:hidden p-0"}`}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}

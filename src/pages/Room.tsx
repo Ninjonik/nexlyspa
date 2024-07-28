@@ -105,7 +105,7 @@ export const Room = () => {
     return () => {
       unsubscribeRoom();
     };
-  }, []);
+  }, [roomId]);
 
   useEffect(() => {
     if (room && room.$id) {
@@ -114,6 +114,7 @@ export const Room = () => {
         (response) => {
           const payload = response.payload as MessageObject;
           console.info("NEW MESSAGE:", payload.author.name, payload.message);
+          console.log("REF:", optimisticMessagesRef);
           const messageRoomId = payload.room.$id;
           if (messageRoomId === room.$id && user) {
             if (
@@ -122,12 +123,12 @@ export const Room = () => {
             ) {
               const newOptimisticMessages = [...optimisticMessagesRef.current];
               newOptimisticMessages.pop();
+              optimisticMessagesRef.current = newOptimisticMessages;
               setOptimisticMessages(newOptimisticMessages);
             }
             // setOptimisticMessages([]);
             setMessages((prevMessages) => [payload, ...prevMessages]);
           }
-          console.log(messages, optimisticMessages);
         },
       );
 
@@ -135,7 +136,7 @@ export const Room = () => {
         unsubscribeMessages();
       };
     }
-  }, [room?.$id]);
+  }, [room?.$id, user]);
 
   useEffect(() => {
     optimisticMessagesRef.current = optimisticMessages;
@@ -151,10 +152,12 @@ export const Room = () => {
   if (!room) return <FullscreenLoading />;
 
   const handleOnDisconnectedFn = async () => {};
+  console.log("OPTIMISTIC REF:", optimisticMessagesRef.current);
+  console.log("OPTIMISTIC STATE:", optimisticMessages);
 
   return (
     <section
-      className={`grid grid-cols-12 grid-rows-12 w-full h-full overflow-hidden ${slide === "main" ? "" : "hidden"}`}
+      className={`grid grid-cols-12 grid-rows-12 w-full h-full overflow-hidden ${slide === "main" ? "" : "_md:hidden"}`}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}

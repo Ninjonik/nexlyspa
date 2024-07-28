@@ -21,6 +21,22 @@ const config: Config = {
         "span-14": "span 14 / span 14",
         "span-16": "span 16 / span 16",
       },
+      screens: {
+        _2xl: { max: "1535px" },
+        // => @media (max-width: 1535px) { ... }
+
+        _xl: { max: "1279px" },
+        // => @media (max-width: 1279px) { ... }
+
+        _lg: { max: "1023px" },
+        // => @media (max-width: 1023px) { ... }
+
+        _md: { max: "767px" },
+        // => @media (max-width: 767px) { ... }
+
+        _sm: { max: "639px" },
+        // => @media (max-width: 639px) { ... }
+      },
     },
   },
   daisyui: {
