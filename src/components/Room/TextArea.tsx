@@ -5,7 +5,8 @@ import React, {
   useState,
   useRef,
   SetStateAction,
-  Dispatch, RefObject,
+  Dispatch,
+  RefObject,
 } from "react";
 import { FaPlus } from "react-icons/fa";
 import {
@@ -81,6 +82,7 @@ export const Textarea = ({
       attachmentIds = await uploadMultipleFiles(attachmentsToSend);
     }
 
+    console.info("SENDING NEW MESSAGE");
     const result = await functions.createExecution(
       "sendMessage",
       JSON.stringify({
@@ -93,8 +95,10 @@ export const Textarea = ({
       undefined,
       ExecutionMethod.POST,
     );
+    console.log("SENDMESSAGE RESULT:", result);
 
     const response = JSON.parse(result.responseBody);
+    console.log("SEND MESSAGE REPSONSE:", response);
     if (!response) return;
   };
 
@@ -116,7 +120,7 @@ export const Textarea = ({
         },
         ...prevMessages,
       ]);
-      messagesSectionRef.current?.scrollTo(0,0);
+      messagesSectionRef.current?.scrollTo(0, 0);
       submitAction(message, attachments);
     }
   };
@@ -280,7 +284,9 @@ export const Textarea = ({
                 tenorApiKey={
                   import.meta.env.VITE_PUBLIC_TENOR_KEY || "no_tenor_api_key"
                 }
-                onGifClick={(e: { url: string }) => submitAction(e.url, attachments)}
+                onGifClick={(e: { url: string }) =>
+                  submitAction(e.url, attachments)
+                }
               />
             }
             trigger={"click"}
