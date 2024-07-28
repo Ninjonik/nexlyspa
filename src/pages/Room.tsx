@@ -105,7 +105,7 @@ export const Room = () => {
     return () => {
       unsubscribeRoom();
     };
-  }, []);
+  }, [roomId]);
 
   useEffect(() => {
     if (room && room.$id) {
