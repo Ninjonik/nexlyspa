@@ -1,22 +1,33 @@
 import express from "express";
-import { Client, Databases } from "node-appwrite";
 import "dotenv/config";
+import { database } from "../common.js";
 
 const router = express.Router();
 
-router.get("/checkRoom", async (req, res) => {
-  const client = new Client()
-    .setEndpoint(process.env.APPWRITE_ENDPOINT)
-    .setProject(process.env.APPWRITE_PROJECT)
-    .setKey(process.env.APPWRITE_KEY);
+export const checkRoom = async (roomId) => {
+  try {
+    const room = await database.getDocument(
+      process.env.APPWRITE_DB_NAME,
+      "rooms",
+      roomId,
+    );
 
+    if (room?.closed) {
+      return "closed";
+    }
+    return "exists";
+  } catch (err) {
+    return "doesntExist";
+  }
+};
+
+router.post("/checkRoom", async (req, res) => {
   if (!req?.body)
     return res.json({
       success: false,
       message: "Invalid payload: no body.",
     });
 
-  const database = new Databases(client);
   const { roomId } = req.body;
 
   if (!roomId) {
@@ -26,28 +37,19 @@ router.get("/checkRoom", async (req, res) => {
     });
   }
 
-  try {
-    const room = await database.getDocument(
-      process.env.APPWRITE_DATABASE,
-      "rooms",
-      roomId,
-    );
-
-    if (room?.closed) {
-      console.log(roomId, "closed");
-      return res.json({
-        success: false,
-        message: "Room with the specified room code is currently closed.",
-      });
-    }
-    console.log(roomId, "exists");
-    return res.json({
+  const result = await checkRoom(roomId);
+  if (result === "closed") {
+    return result.json({
+      success: false,
+      message: "Room with the specified room code is currently closed.",
+    });
+  } else if (result === "exists") {
+    return result.json({
       success: true,
       message: "Room with the specified room code exists.",
     });
-  } catch (err) {
-    console.log(roomId, "doesn't exist");
-    return res.json({
+  } else {
+    return result.json({
       success: false,
       message: "Room with the specified room code does not exist.",
     });

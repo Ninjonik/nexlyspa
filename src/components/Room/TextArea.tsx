@@ -83,9 +83,12 @@ export const Textarea = ({
 
     console.info("SENDING NEW MESSAGE");
     const result = await fetch(
-      `${process.env.VITE_PUBLIC_API_HOSTNAME}/sendMessage`,
+      `${import.meta.env.VITE_PUBLIC_API_HOSTNAME}/sendMessage`,
       {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
           jwt: jwt.jwt,
           message: message,
@@ -95,7 +98,7 @@ export const Textarea = ({
       },
     );
     const response = await result.json();
-    if (!response.ok) return;
+    if (!response || !result.ok || !response.success) return;
 
     console.log("SENDMESSAGE RESULT:", response);
   };

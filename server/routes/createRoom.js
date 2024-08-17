@@ -1,37 +1,22 @@
 import express from "express";
-import {
-  Client,
-  Databases,
-  Account,
-  Permission,
-  Role,
-  Functions,
-  ExecutionMethod,
-} from "node-appwrite";
+import { Permission, Role, ExecutionMethod } from "node-appwrite";
 import { generate } from "random-words";
 import "dotenv/config";
+import { database, jwtAccount, jwtClient } from "../common.js";
+import { checkRoom } from "./checkRoom.js";
 
 const router = express.Router();
 
-const generateUniqueRoomId = async (functions) => {
+const generateUniqueRoomId = async () => {
   let generatedCode = "";
   let codeExists = true;
 
   while (codeExists) {
     generatedCode = generate({ minLength: 6, maxLength: 7 });
 
-    const result = await functions.createExecution(
-      "checkRoom",
-      JSON.stringify({
-        roomId: generatedCode,
-      }),
-      false,
-      undefined,
-      ExecutionMethod.GET,
-    );
+    const result = await checkRoom(generatedCode);
 
-    const response = JSON.parse(result.responseBody);
-    if (!response.success) {
+    if (result === "doesntExist") {
       codeExists = false;
     }
   }
@@ -40,25 +25,11 @@ const generateUniqueRoomId = async (functions) => {
 };
 
 router.post("/createRoom", async (req, res) => {
-  const client = new Client()
-    .setEndpoint(process.env.APPWRITE_ENDPOINT)
-    .setProject(process.env.APPWRITE_PROJECT)
-    .setKey(process.env.APPWRITE_KEY);
-
   if (!req?.body)
     return res.json({
       success: false,
       message: "Invalid payload: no body.",
     });
-
-  const database = new Databases(client);
-  const functions = new Functions(client);
-
-  const jwtClient = new Client()
-    .setEndpoint(process.env.APPWRITE_ENDPOINT)
-    .setProject(process.env.APPWRITE_PROJECT);
-
-  const jwtAccount = new Account(jwtClient);
 
   const { jwt, roomName, roomDescription, roomAvatar } = req.body;
 
@@ -88,7 +59,7 @@ router.post("/createRoom", async (req, res) => {
   }
 
   try {
-    const generatedCode = await generateUniqueRoomId(functions);
+    const generatedCode = await generateUniqueRoomId();
 
     const newRoom = {
       $id: generatedCode,
@@ -106,7 +77,7 @@ router.post("/createRoom", async (req, res) => {
     };
 
     const oldUser = await database.getDocument(
-      process.env.APPWRITE_DATABASE,
+      process.env.APPWRITE_DB_NAME,
       "users",
       account.$id,
     );
@@ -117,7 +88,7 @@ router.post("/createRoom", async (req, res) => {
         : [newRoom];
 
     const newUser = await database.updateDocument(
-      process.env.APPWRITE_DATABASE,
+      process.env.APPWRITE_DB_NAME,
       "users",
       account.$id,
       {

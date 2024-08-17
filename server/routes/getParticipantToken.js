@@ -1,23 +1,16 @@
 import express from "express";
 import { AccessToken } from "livekit-server-sdk";
-import { Client, Databases, Account } from "node-appwrite";
 import "dotenv/config";
+import { database, jwtAccount, jwtClient } from "../common.js";
 
 const router = express.Router();
 
-router.get("/getParticipantToken", async (req, res) => {
-  const client = new Client()
-    .setEndpoint(process.env.APPWRITE_ENDPOINT)
-    .setProject(process.env.APPWRITE_PROJECT)
-    .setKey(process.env.APPWRITE_KEY);
-
+router.post("/getParticipantToken", async (req, res) => {
   if (!req?.body)
     return res.json({
       success: false,
       message: "Invalid payload: no body.",
     });
-
-  const database = new Databases(client);
 
   const { roomId, jwt } = req.body;
 
@@ -27,12 +20,6 @@ router.get("/getParticipantToken", async (req, res) => {
       message: "Some of the required parameters is missing.",
     });
   }
-
-  const jwtClient = new Client()
-    .setEndpoint(process.env.APPWRITE_ENDPOINT)
-    .setProject(process.env.APPWRITE_PROJECT);
-
-  const jwtAccount = new Account(jwtClient);
 
   let account;
 
@@ -54,7 +41,7 @@ router.get("/getParticipantToken", async (req, res) => {
 
   try {
     const room = await database.getDocument(
-      process.env.APPWRITE_DATABASE,
+      process.env.APPWRITE_DB_NAME,
       "rooms",
       roomId,
     );
@@ -88,7 +75,7 @@ router.get("/getParticipantToken", async (req, res) => {
       token: await at.toJwt(),
     });
   } catch (err) {
-    console.log(roomId, "doesn't exist");
+    console.log(roomId, "doesn't exist", "GPT");
     return res.json({
       success: false,
       message: "Room with the specified room code does not exist.",

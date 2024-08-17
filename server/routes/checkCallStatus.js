@@ -1,18 +1,11 @@
 import express from "express";
 import { RoomServiceClient } from "livekit-server-sdk";
-import { Client, Databases, Account } from "node-appwrite";
 import "dotenv/config";
+import { database, jwtAccount, jwtClient } from "../common.js";
 
 const router = express.Router();
 
-router.get("/checkCallStatus", async (req, res) => {
-  const client = new Client()
-    .setEndpoint(process.env.APPWRITE_ENDPOINT)
-    .setProject(process.env.APPWRITE_PROJECT)
-    .setKey(process.env.APPWRITE_KEY);
-
-  const database = new Databases(client);
-
+router.post("/checkCallStatus", async (req, res) => {
   if (!req?.body)
     return res.json({
       success: false,
@@ -27,11 +20,6 @@ router.get("/checkCallStatus", async (req, res) => {
     });
   }
 
-  const jwtClient = new Client()
-    .setEndpoint(process.env.APPWRITE_ENDPOINT)
-    .setProject(process.env.APPWRITE_PROJECT);
-
-  const jwtAccount = new Account(jwtClient);
   let account;
 
   try {
@@ -52,7 +40,7 @@ router.get("/checkCallStatus", async (req, res) => {
 
   try {
     const room = await database.getDocument(
-      process.env.APPWRITE_DATABASE,
+      process.env.APPWRITE_DB_NAME,
       "rooms",
       roomId,
     );
@@ -77,7 +65,7 @@ router.get("/checkCallStatus", async (req, res) => {
       console.log(roomId, "participants count is 0");
       try {
         await database.updateDocument(
-          process.env.APPWRITE_DATABASE,
+          process.env.APPWRITE_DB_NAME,
           "rooms",
           roomId,
           {
@@ -100,7 +88,7 @@ router.get("/checkCallStatus", async (req, res) => {
       newCallStatus: status,
     });
   } catch (err) {
-    console.log(roomId, "doesn't exist");
+    console.log(roomId, "doesn't exist", "CCS");
     return res.json({
       success: false,
       message: "Room with the specified room code does not exist.",

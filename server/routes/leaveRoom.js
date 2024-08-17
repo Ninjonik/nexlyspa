@@ -1,36 +1,16 @@
 import express from "express";
-import {
-  Client,
-  Databases,
-  Account,
-  Functions,
-  Permission,
-  Role,
-} from "node-appwrite";
+import { Permission, Role } from "node-appwrite";
 import "dotenv/config";
+import { database, jwtAccount, jwtClient } from "../common.js";
 
 const router = express.Router();
 
 router.post("/leaveRoom", async (req, res) => {
-  const client = new Client()
-    .setEndpoint(process.env.APPWRITE_ENDPOINT)
-    .setProject(process.env.APPWRITE_PROJECT)
-    .setKey(process.env.APPWRITE_KEY);
-
   if (!req?.body)
     return res.json({
       success: false,
       message: "Invalid payload: no body.",
     });
-
-  const database = new Databases(client);
-  const functions = new Functions(client);
-
-  const jwtClient = new Client()
-    .setEndpoint(process.env.APPWRITE_ENDPOINT)
-    .setProject(process.env.APPWRITE_PROJECT);
-
-  const jwtAccount = new Account(jwtClient);
 
   const { jwt, roomId } = req.body;
 
@@ -61,7 +41,7 @@ router.post("/leaveRoom", async (req, res) => {
 
   try {
     const roomData = await database.getDocument(
-      process.env.APPWRITE_DATABASE,
+      process.env.APPWRITE_DB_NAME,
       "rooms",
       roomId,
     );
@@ -71,15 +51,6 @@ router.post("/leaveRoom", async (req, res) => {
 
     if (userIndex > -1) {
       newRoomUsers.splice(userIndex, 1);
-    }
-
-    // If the room is empty then delete it
-    if (!newRoomUsers || newRoomUsers.length === 0) {
-      await database.deleteDocument(
-        process.env.APPWRITE_DATABASE,
-        "rooms",
-        roomId,
-      );
     }
 
     let newRoomDataPermissions = [...roomData.$permissions];
@@ -93,7 +64,7 @@ router.post("/leaveRoom", async (req, res) => {
     }
 
     const newRoom = await database.updateDocument(
-      process.env.APPWRITE_DATABASE,
+      process.env.APPWRITE_DB_NAME,
       "rooms",
       roomId,
       {
@@ -101,6 +72,15 @@ router.post("/leaveRoom", async (req, res) => {
       },
       newRoomDataPermissions,
     );
+
+    // If the room is empty then delete it
+    if (!newRoomUsers || newRoomUsers.length === 0) {
+      await database.deleteDocument(
+        process.env.APPWRITE_DB_NAME,
+        "rooms",
+        roomId,
+      );
+    }
 
     if (newRoom) {
       return res.json({

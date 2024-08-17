@@ -39,9 +39,12 @@ export const Homepage = () => {
 
       // Validate room's code
       const result = await fetch(
-        `${process.env.VITE_PUBLIC_API_HOSTNAME}/joinRoom`,
+        `${import.meta.env.VITE_PUBLIC_API_HOSTNAME}/joinRoom`,
         {
           method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify({
             jwt: jwt.jwt,
             roomId: code,
@@ -50,7 +53,7 @@ export const Homepage = () => {
       );
 
       response = await result.json();
-      if (!response.ok)
+      if (!response || !result.ok || !response.success)
         return handleReturn(
           response?.message ?? "An unknown error has happened.",
           toastId,
@@ -69,9 +72,12 @@ export const Homepage = () => {
         return handleReturn("Please fill all the fields.", toastId);
 
       const result = await fetch(
-        `${process.env.VITE_PUBLIC_API_HOSTNAME}/createRoom"`,
+        `${import.meta.env.VITE_PUBLIC_API_HOSTNAME}/createRoom`,
         {
           method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify({
             jwt: jwt.jwt,
             roomName: name,
@@ -81,9 +87,10 @@ export const Homepage = () => {
         },
       );
       response = await result.json();
-      if (!response.ok)
+      console.log(response);
+      if (!response || !result.ok || !response.success)
         return handleReturn(
-          "Room with the specified code does not exist.",
+          "There's been an error while creating your room.",
           toastId,
         );
 
@@ -95,10 +102,12 @@ export const Homepage = () => {
       });
     }
 
-    // Handle the common stuff
-    setUser(response.newUser);
-    navigate("/room/" + response.roomId);
-    navigate(0);
+    setTimeout(() => {
+      // Handle the common stuff
+      setUser(response.newUser);
+      navigate("/room/" + response.roomId, { replace: true });
+      window.location.reload();
+    }, 2000);
   };
 
   const [messageJoin, formActionJoin] = useActionState(handleRoomSubmit, null);

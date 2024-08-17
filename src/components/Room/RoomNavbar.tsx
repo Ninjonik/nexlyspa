@@ -33,9 +33,12 @@ export default function RoomNavbar({
     const jwt = await account.createJWT();
 
     const result = await fetch(
-      `${process.env.VITE_PUBLIC_API_HOSTNAME}/leaveRoom"`,
+      `${import.meta.env.VITE_PUBLIC_API_HOSTNAME}/leaveRoom`,
       {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
           jwt: jwt.jwt,
           roomId: roomId,
@@ -43,7 +46,7 @@ export default function RoomNavbar({
       },
     );
     const response = await result.json();
-    if (!response.ok) return;
+    if (!response || !result.ok || !response.success) return;
 
     if (rooms && Array.from(Object.keys(rooms)).length > 0) {
       const newRooms: RoomObjectArray = { ...rooms };
@@ -66,9 +69,12 @@ export default function RoomNavbar({
       const jwt = await account.createJWT();
 
       const result = await fetch(
-        `${process.env.VITE_PUBLIC_API_HOSTNAME}/startCall`,
+        `${import.meta.env.VITE_PUBLIC_API_HOSTNAME}/startCall`,
         {
           method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify({
             jwt: jwt.jwt,
             roomId: roomId,
@@ -76,7 +82,8 @@ export default function RoomNavbar({
         },
       );
       const response = await result.json();
-      if (!response.ok) return "Failed to call the room";
+      if (!response || !result.ok || !response.success)
+        return "Failed to call the room";
       setInCall(true);
     } catch (e) {
       console.info(e);
@@ -89,9 +96,12 @@ export default function RoomNavbar({
     const jwt = await account.createJWT();
 
     const result = await fetch(
-      `${process.env.VITE_PUBLIC_API_HOSTNAME}/checkCallStatus`,
+      `${import.meta.env.VITE_PUBLIC_API_HOSTNAME}/checkCallStatus`,
       {
-        method: "GET",
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
           jwt: jwt.jwt,
           roomId: roomId,
@@ -99,7 +109,7 @@ export default function RoomNavbar({
       },
     );
     const response = await result.json();
-    if (!response.ok) return;
+    if (!response || !result.ok || !response.success) return;
   };
 
   return (

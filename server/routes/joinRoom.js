@@ -1,37 +1,17 @@
 import express from "express";
-import {
-  Client,
-  Databases,
-  Account,
-  Functions,
-  ExecutionMethod,
-  Permission,
-  Role,
-} from "node-appwrite";
+import { Permission, Role } from "node-appwrite";
 import "dotenv/config";
+import { database, jwtAccount, jwtClient } from "../common.js";
+import { checkRoom } from "./checkRoom.js";
 
 const router = express.Router();
 
 router.post("/joinRoom", async (req, res) => {
-  const client = new Client()
-    .setEndpoint(process.env.APPWRITE_ENDPOINT)
-    .setProject(process.env.APPWRITE_PROJECT)
-    .setKey(process.env.APPWRITE_KEY);
-
   if (!req?.body)
     return res.json({
       success: false,
       message: "Invalid payload: no body.",
     });
-
-  const database = new Databases(client);
-  const functions = new Functions(client);
-
-  const jwtClient = new Client()
-    .setEndpoint(process.env.APPWRITE_ENDPOINT)
-    .setProject(process.env.APPWRITE_PROJECT);
-
-  const jwtAccount = new Account(jwtClient);
 
   const { jwt, roomId } = req.body;
 
@@ -61,18 +41,8 @@ router.post("/joinRoom", async (req, res) => {
   }
 
   try {
-    const result = await functions.createExecution(
-      "checkRoom",
-      JSON.stringify({
-        roomId: roomId,
-      }),
-      false,
-      undefined,
-      ExecutionMethod.GET,
-    );
-
-    const response = JSON.parse(result.responseBody);
-    if (!response.success) {
+    const result = await checkRoom(roomId, jwt);
+    if (result !== "exists") {
       return res.json({
         success: false,
         message:
@@ -81,7 +51,7 @@ router.post("/joinRoom", async (req, res) => {
     }
 
     const roomData = await database.getDocument(
-      process.env.APPWRITE_DATABASE,
+      process.env.APPWRITE_DB_NAME,
       "rooms",
       roomId,
     );
@@ -96,7 +66,7 @@ router.post("/joinRoom", async (req, res) => {
         : userPermissions;
 
     const newRoom = await database.updateDocument(
-      process.env.APPWRITE_DATABASE,
+      process.env.APPWRITE_DB_NAME,
       "rooms",
       roomId,
       {

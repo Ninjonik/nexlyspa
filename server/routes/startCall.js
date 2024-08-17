@@ -1,22 +1,15 @@
 import express from "express";
-import { Client, Databases, Account } from "node-appwrite";
 import "dotenv/config";
+import { database, jwtAccount, jwtClient } from "../common.js";
 
 const router = express.Router();
 
 router.patch("/startCall", async (req, res) => {
-  const client = new Client()
-    .setEndpoint(process.env.APPWRITE_ENDPOINT)
-    .setProject(process.env.APPWRITE_PROJECT)
-    .setKey(process.env.APPWRITE_KEY);
-
   if (!req?.body)
     return res.json({
       success: false,
       message: "Invalid payload: no body.",
     });
-
-  const database = new Databases(client);
 
   const { jwt, roomId } = req.body;
 
@@ -26,12 +19,6 @@ router.patch("/startCall", async (req, res) => {
       message: "Some of the required parameters is missing.",
     });
   }
-
-  const jwtClient = new Client()
-    .setEndpoint(process.env.APPWRITE_ENDPOINT)
-    .setProject(process.env.APPWRITE_PROJECT);
-
-  const jwtAccount = new Account(jwtClient);
 
   let account;
 
@@ -53,7 +40,7 @@ router.patch("/startCall", async (req, res) => {
 
   try {
     const room = await database.getDocument(
-      process.env.APPWRITE_DATABASE,
+      process.env.APPWRITE_DB_NAME,
       "rooms",
       roomId,
     );
@@ -71,7 +58,7 @@ router.patch("/startCall", async (req, res) => {
     }
 
     await database.updateDocument(
-      process.env.APPWRITE_DATABASE,
+      process.env.APPWRITE_DB_NAME,
       "rooms",
       roomId,
       {
@@ -84,7 +71,7 @@ router.patch("/startCall", async (req, res) => {
       message: "Successfully initiated a call in the room.",
     });
   } catch (err) {
-    console.info(roomId, "doesn't exist");
+    console.info(roomId, "doesn't exist", "SC");
     return res.json({
       success: false,
       message: "Room with the specified room code does not exist.",

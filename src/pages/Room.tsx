@@ -48,16 +48,19 @@ export const Room = () => {
   };
 
   useEffect(() => {
-    if (!room || !room.call || !user?.name) return;
+    if (!room || !user?.name) return;
 
     (async () => {
       try {
         const jwt = await account.createJWT();
 
         const result = await fetch(
-          `${process.env.VITE_PUBLIC_API_HOSTNAME}/getParticipantToken`,
+          `${import.meta.env.VITE_PUBLIC_API_HOSTNAME}/getParticipantToken`,
           {
-            method: "GET",
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
             body: JSON.stringify({
               jwt: jwt.jwt,
               roomId: room.$id,
@@ -66,8 +69,9 @@ export const Room = () => {
         );
 
         const response = await result.json();
-        console.log(result, response);
-        if (!response.ok) return "Failed to create a call token.";
+
+        if (!response || !result.ok || !response.success)
+          return "Failed to create a call token.";
 
         setToken(response.token);
       } catch (e) {
@@ -95,18 +99,18 @@ export const Room = () => {
     fetchRoomData();
     fetchMessages(roomId);
 
-    const unsubscribeRoom = client.subscribe(
-      `databases.${database}.collections.rooms.documents.${roomId}`,
-      (response) => {
-        const payload = response.payload as RoomObject;
-        console.log("NEW ROOM PAYLOAD", payload);
-        setRoom(payload);
-      },
-    );
-
-    return () => {
-      unsubscribeRoom();
-    };
+    // const unsubscribeRoom = client.subscribe(
+    //   `databases.${database}.collections.rooms.documents.${roomId}`,
+    //   (response) => {
+    //     const payload = response.payload as RoomObject;
+    //     console.log("NEW ROOM PAYLOAD", payload);
+    //     setRoom(payload);
+    //   },
+    // );
+    //
+    // return () => {
+    //   unsubscribeRoom();
+    // };
   }, [roomId]);
 
   useEffect(() => {

@@ -1,23 +1,15 @@
 import express from "express";
-import { Client, Databases, Users } from "node-appwrite";
 import "dotenv/config";
+import { database, users } from "../common.js";
 
 const router = express.Router();
 
 router.delete("/deleteUser", async (req, res) => {
-  const client = new Client()
-    .setEndpoint(process.env.APPWRITE_ENDPOINT)
-    .setProject(process.env.APPWRITE_PROJECT)
-    .setKey(process.env.APPWRITE_KEY);
-
   if (!req?.body)
     return res.json({
       success: false,
       message: "Invalid payload: no body.",
     });
-
-  const database = new Databases(client);
-  const users = new Users(client);
 
   const { userId, provider } = req.body;
 
@@ -33,7 +25,7 @@ router.delete("/deleteUser", async (req, res) => {
 
   try {
     await database.deleteDocument(
-      process.env.APPWRITE_DATABASE,
+      process.env.APPWRITE_DB_NAME,
       "users",
       userId,
     );

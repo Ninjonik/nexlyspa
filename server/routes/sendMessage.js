@@ -1,36 +1,16 @@
 import express from "express";
-import {
-  Client,
-  Databases,
-  Permission,
-  Role,
-  ID,
-  Account,
-} from "node-appwrite";
+import { Permission, Role, ID } from "node-appwrite";
 import "dotenv/config";
+import { database, jwtAccount, jwtClient, jwtDatabases } from "../common.js";
 
 const router = express.Router();
 
 router.post("/sendMessage", async (req, res) => {
-  const client = new Client()
-    .setEndpoint(process.env.APPWRITE_ENDPOINT)
-    .setProject(process.env.APPWRITE_PROJECT)
-    .setKey(process.env.APPWRITE_KEY);
-
   if (!req?.body)
     return res.json({
       success: false,
       message: "Invalid payload: no body.",
     });
-
-  const database = new Databases(client);
-
-  const jwtClient = new Client()
-    .setEndpoint(process.env.APPWRITE_ENDPOINT)
-    .setProject(process.env.APPWRITE_PROJECT);
-
-  const jwtDatabases = new Databases(jwtClient);
-  const jwtAccount = new Account(jwtClient);
 
   const { jwt, message, attachments, roomId } = req.body;
 
@@ -61,7 +41,7 @@ router.post("/sendMessage", async (req, res) => {
 
   try {
     const roomData = await jwtDatabases.getDocument(
-      process.env.APPWRITE_DATABASE,
+      process.env.APPWRITE_DB_NAME,
       "rooms",
       roomId,
     );
@@ -88,7 +68,7 @@ router.post("/sendMessage", async (req, res) => {
     }
 
     const result = await database.createDocument(
-      process.env.APPWRITE_DATABASE,
+      process.env.APPWRITE_DB_NAME,
       "messages",
       ID.unique(),
       {

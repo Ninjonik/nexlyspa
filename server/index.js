@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors"; // Import CORS
 import checkCallStatus from "./routes/checkCallStatus.js";
 import checkRoom from "./routes/checkRoom.js";
 import createRoom from "./routes/createRoom.js";
@@ -12,6 +13,10 @@ import "dotenv/config";
 
 const app = express();
 const port = 3001;
+
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Start server
 app.listen(port, () => {
