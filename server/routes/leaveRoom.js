@@ -11,7 +11,7 @@ import "dotenv/config";
 
 const router = express.Router();
 
-router.patch("/leaveRoom", async (req, res) => {
+router.post("/leaveRoom", async (req, res) => {
   const client = new Client()
     .setEndpoint(process.env.APPWRITE_ENDPOINT)
     .setProject(process.env.APPWRITE_PROJECT)

@@ -2,8 +2,7 @@ import Avatar from "../Avatar.tsx";
 import { MdCall } from "react-icons/md";
 import { FaUsers } from "react-icons/fa6";
 import { IoMdExit } from "react-icons/io";
-import { account, functions } from "../../utils/appwrite.ts";
-import { ExecutionMethod } from "appwrite";
+import { account } from "../../utils/appwrite.ts";
 import RoomObject, {
   RoomObjectArray,
 } from "../../utils/interfaces/RoomObject.ts";
@@ -32,16 +31,19 @@ export default function RoomNavbar({
     const toastId = toast.loading("Leaving the room...");
 
     const jwt = await account.createJWT();
-    functions.createExecution(
-      "leaveRoom",
-      JSON.stringify({
-        jwt: jwt.jwt,
-        roomId: roomId,
-      }),
-      false,
-      undefined,
-      ExecutionMethod.POST,
+
+    const result = await fetch(
+      `${process.env.VITE_PUBLIC_API_HOSTNAME}/leaveRoom"`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          jwt: jwt.jwt,
+          roomId: roomId,
+        }),
+      },
     );
+    const response = await result.json();
+    if (!response.ok) return;
 
     if (rooms && Array.from(Object.keys(rooms)).length > 0) {
       const newRooms: RoomObjectArray = { ...rooms };
@@ -62,19 +64,19 @@ export default function RoomNavbar({
   const startACall = async (roomId: string) => {
     try {
       const jwt = await account.createJWT();
-      const result = await functions.createExecution(
-        "startCall",
-        JSON.stringify({
-          jwt: jwt.jwt,
-          roomId: roomId,
-        }),
-        false,
-        undefined,
-        ExecutionMethod.PATCH,
+
+      const result = await fetch(
+        `${process.env.VITE_PUBLIC_API_HOSTNAME}/startCall`,
+        {
+          method: "PATCH",
+          body: JSON.stringify({
+            jwt: jwt.jwt,
+            roomId: roomId,
+          }),
+        },
       );
-      const response = JSON.parse(result.responseBody);
-      console.log(result, response);
-      if (!response.success) return "Failed to call the room.";
+      const response = await result.json();
+      if (!response.ok) return "Failed to call the room";
       setInCall(true);
     } catch (e) {
       console.info(e);
@@ -85,18 +87,19 @@ export default function RoomNavbar({
   const leaveTheCall = async (roomId: string) => {
     setInCall(false);
     const jwt = await account.createJWT();
-    const result = await functions.createExecution(
-      "checkCallStatus",
-      JSON.stringify({
-        jwt: jwt.jwt,
-        roomId: roomId,
-      }),
-      false,
-      undefined,
-      ExecutionMethod.GET,
+
+    const result = await fetch(
+      `${process.env.VITE_PUBLIC_API_HOSTNAME}/checkCallStatus`,
+      {
+        method: "GET",
+        body: JSON.stringify({
+          jwt: jwt.jwt,
+          roomId: roomId,
+        }),
+      },
     );
-    const response = JSON.parse(result.responseBody);
-    console.info(response);
+    const response = await result.json();
+    if (!response.ok) return;
   };
 
   return (

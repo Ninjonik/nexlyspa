@@ -12,7 +12,7 @@ import "dotenv/config";
 
 const router = express.Router();
 
-router.patch("/joinRoom", async (req, res) => {
+router.post("/joinRoom", async (req, res) => {
   const client = new Client()
     .setEndpoint(process.env.APPWRITE_ENDPOINT)
     .setProject(process.env.APPWRITE_PROJECT)

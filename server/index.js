@@ -11,7 +11,7 @@ import startCall from "./routes/startCall.js";
 import "dotenv/config";
 
 const app = express();
-const port = 3050;
+const port = 3001;
 
 // Start server
 app.listen(port, () => {
