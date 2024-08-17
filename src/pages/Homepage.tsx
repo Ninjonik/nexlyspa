@@ -1,7 +1,6 @@
 // @ts-expect-error erroneous due to outdated react types, will be fixed with react 19
 import { useActionState, useState } from "react";
-import { account, functions } from "../utils/appwrite.ts";
-import { ExecutionMethod } from "appwrite";
+import { account } from "../utils/appwrite.ts";
 import { useUserContext } from "../utils/UserContext.tsx";
 import { useNavigate } from "react-router-dom";
 import { toast, Id } from "react-toastify";
@@ -39,19 +38,22 @@ export const Homepage = () => {
       if (!code) return handleReturn("Please enter a valid code.", toastId);
 
       // Validate room's code
-      const result = await functions.createExecution(
-        "joinRoom",
-        JSON.stringify({
-          jwt: jwt.jwt,
-          roomId: code,
-        }),
-        false,
-        undefined,
-        ExecutionMethod.POST,
+      const result = await fetch(
+        `${import.meta.env.VITE_PUBLIC_API_HOSTNAME}/joinRoom`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            jwt: jwt.jwt,
+            roomId: code,
+          }),
+        },
       );
-      console.log(result);
-      response = JSON.parse(result.responseBody);
-      if (!response.success)
+
+      response = await result.json();
+      if (!response || !result.ok || !response.success)
         return handleReturn(
           response?.message ?? "An unknown error has happened.",
           toastId,
@@ -69,22 +71,26 @@ export const Homepage = () => {
       if (!name || !description)
         return handleReturn("Please fill all the fields.", toastId);
 
-      const result = await functions.createExecution(
-        "createRoom",
-        JSON.stringify({
-          jwt: jwt.jwt,
-          roomName: name,
-          roomDescription: description,
-          roomAvatar: "defaultAvatar",
-        }),
-        false,
-        undefined,
-        ExecutionMethod.POST,
+      const result = await fetch(
+        `${import.meta.env.VITE_PUBLIC_API_HOSTNAME}/createRoom`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            jwt: jwt.jwt,
+            roomName: name,
+            roomDescription: description,
+            roomAvatar: "defaultAvatar",
+          }),
+        },
       );
-      response = JSON.parse(result.responseBody);
-      if (!response.success)
+      response = await result.json();
+      console.log(response);
+      if (!response || !result.ok || !response.success)
         return handleReturn(
-          "Room with the specified code does not exist.",
+          "There's been an error while creating your room.",
           toastId,
         );
 
@@ -96,10 +102,12 @@ export const Homepage = () => {
       });
     }
 
-    // Handle the common stuff
-    setUser(response.newUser);
-    navigate("/room/" + response.roomId);
-    navigate(0);
+    setTimeout(() => {
+      // Handle the common stuff
+      setUser(response.newUser);
+      navigate("/room/" + response.roomId, { replace: true });
+      window.location.reload();
+    }, 2000);
   };
 
   const [messageJoin, formActionJoin] = useActionState(handleRoomSubmit, null);

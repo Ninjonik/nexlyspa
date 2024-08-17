@@ -23,8 +23,7 @@ import { useUserContext } from "../../utils/UserContext.tsx";
 import RoomObject from "../../utils/interfaces/RoomObject.ts";
 import Tippy from "@tippyjs/react";
 import uploadMultipleFiles from "../../utils/uploadMultipleFiles.ts";
-import { account, functions } from "../../utils/appwrite.ts";
-import { ExecutionMethod } from "appwrite";
+import { account } from "../../utils/appwrite.ts";
 import MessageObject from "../../utils/interfaces/MessageObject.ts";
 
 interface TextareaProps {
@@ -83,23 +82,25 @@ export const Textarea = ({
     }
 
     console.info("SENDING NEW MESSAGE");
-    const result = await functions.createExecution(
-      "sendMessage",
-      JSON.stringify({
-        jwt: jwt.jwt,
-        message: message,
-        attachments: attachmentIds,
-        roomId: room.$id,
-      }),
-      false,
-      undefined,
-      ExecutionMethod.POST,
+    const result = await fetch(
+      `${import.meta.env.VITE_PUBLIC_API_HOSTNAME}/sendMessage`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          jwt: jwt.jwt,
+          message: message,
+          attachments: attachmentIds,
+          roomId: room.$id,
+        }),
+      },
     );
-    console.log("SENDMESSAGE RESULT:", result);
+    const response = await result.json();
+    if (!response || !result.ok || !response.success) return;
 
-    const response = JSON.parse(result.responseBody);
-    console.log("SEND MESSAGE REPSONSE:", response);
-    if (!response) return;
+    console.log("SENDMESSAGE RESULT:", response);
   };
 
   const handleSubmit = (_prevState: string, queryData: FormData) => {

@@ -5,15 +5,9 @@ import RoomObject from "../utils/interfaces/RoomObject.ts";
 import { Textarea } from "../components/Room/TextArea.tsx";
 import MessageObject from "../utils/interfaces/MessageObject.ts";
 import { Message } from "../components/Room/Message.tsx";
-import {
-  account,
-  client,
-  database,
-  databases,
-  functions,
-} from "../utils/appwrite.ts";
+import { account, client, database, databases } from "../utils/appwrite.ts";
 import { useUserContext } from "../utils/UserContext.tsx";
-import { ExecutionMethod, Query } from "appwrite";
+import { Query } from "appwrite";
 import { PhotoProvider } from "react-photo-view";
 import { RoomSkeleton } from "../components/Room/RoomSkeleton.tsx";
 import RoomNavbar from "../components/Room/RoomNavbar.tsx";
@@ -54,25 +48,30 @@ export const Room = () => {
   };
 
   useEffect(() => {
-    if (!room || !room.call || !user?.name) return;
+    if (!room || !user?.name) return;
 
     (async () => {
       try {
         const jwt = await account.createJWT();
 
-        const result = await functions.createExecution(
-          "getParticipantToken",
-          JSON.stringify({
-            jwt: jwt.jwt,
-            roomId: room.$id,
-          }),
-          false,
-          undefined,
-          ExecutionMethod.GET,
+        const result = await fetch(
+          `${import.meta.env.VITE_PUBLIC_API_HOSTNAME}/getParticipantToken`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              jwt: jwt.jwt,
+              roomId: room.$id,
+            }),
+          },
         );
-        const response = JSON.parse(result.responseBody);
-        console.log(result, response);
-        if (!response.success) return "Failed to create a call token.";
+
+        const response = await result.json();
+
+        if (!response || !result.ok || !response.success)
+          return "Failed to create a call token.";
 
         setToken(response.token);
       } catch (e) {
@@ -100,18 +99,18 @@ export const Room = () => {
     fetchRoomData();
     fetchMessages(roomId);
 
-    const unsubscribeRoom = client.subscribe(
-      `databases.${database}.collections.rooms.documents.${roomId}`,
-      (response) => {
-        const payload = response.payload as RoomObject;
-        console.log("NEW ROOM PAYLOAD", payload);
-        setRoom(payload);
-      },
-    );
-
-    return () => {
-      unsubscribeRoom();
-    };
+    // const unsubscribeRoom = client.subscribe(
+    //   `databases.${database}.collections.rooms.documents.${roomId}`,
+    //   (response) => {
+    //     const payload = response.payload as RoomObject;
+    //     console.log("NEW ROOM PAYLOAD", payload);
+    //     setRoom(payload);
+    //   },
+    // );
+    //
+    // return () => {
+    //   unsubscribeRoom();
+    // };
   }, [roomId]);
 
   useEffect(() => {
