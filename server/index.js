@@ -12,7 +12,7 @@ import startCall from "./routes/startCall.js";
 import "dotenv/config";
 
 const app = express();
-const port = 3001;
+const port = 4186;
 
 app.use(cors());
 app.use(express.json());
