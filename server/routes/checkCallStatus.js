@@ -1,6 +1,7 @@
 import express from "express";
 import { RoomServiceClient } from "livekit-server-sdk";
 import { Client, Databases, Account } from "node-appwrite";
+import "dotenv/config";
 
 const router = express.Router();
 
@@ -11,6 +12,12 @@ router.get("/checkCallStatus", async (req, res) => {
     .setKey(process.env.APPWRITE_KEY);
 
   const database = new Databases(client);
+
+  if (!req?.body)
+    return res.json({
+      success: false,
+      message: "Invalid payload: no body.",
+    });
 
   const { roomId, jwt } = req.body;
   if (!roomId || !jwt) {

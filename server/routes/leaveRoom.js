@@ -7,6 +7,7 @@ import {
   Permission,
   Role,
 } from "node-appwrite";
+import "dotenv/config";
 
 const router = express.Router();
 
@@ -15,6 +16,12 @@ router.patch("/leaveRoom", async (req, res) => {
     .setEndpoint(process.env.APPWRITE_ENDPOINT)
     .setProject(process.env.APPWRITE_PROJECT)
     .setKey(process.env.APPWRITE_KEY);
+
+  if (!req?.body)
+    return res.json({
+      success: false,
+      message: "Invalid payload: no body.",
+    });
 
   const database = new Databases(client);
   const functions = new Functions(client);

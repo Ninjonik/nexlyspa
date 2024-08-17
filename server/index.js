@@ -8,6 +8,7 @@ import joinRoom from "./routes/joinRoom.js";
 import leaveRoom from "./routes/leaveRoom.js";
 import sendMessage from "./routes/sendMessage.js";
 import startCall from "./routes/startCall.js";
+import "dotenv/config";
 
 const app = express();
 const port = 3050;
