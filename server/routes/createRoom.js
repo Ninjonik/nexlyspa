@@ -52,6 +52,7 @@ router.post("/createRoom", async (req, res) => {
       });
     }
   } catch (e) {
+    console.log(e, jwtClient);
     return res.json({
       success: false,
       message: "Invalid JWT Token",
