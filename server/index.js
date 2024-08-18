@@ -12,6 +12,7 @@ import startCall from "./routes/startCall.js";
 import "dotenv/config";
 
 const app = express();
+const hostname = process.env.HOSTNAME || "0.0.0.0";
 const port = 4186;
 
 app.use(cors());
@@ -19,8 +20,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Start server
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+app.listen(port, hostname, undefined, () => {
+  console.log(`Server running at ${hostname}:${port}`);
 });
 
 app.use(checkCallStatus);
