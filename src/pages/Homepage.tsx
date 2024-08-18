@@ -87,7 +87,6 @@ export const Homepage = () => {
         },
       );
       response = await result.json();
-      console.log(response);
       if (!response || !result.ok || !response.success)
         return handleReturn(
           "There's been an error while creating your room.",

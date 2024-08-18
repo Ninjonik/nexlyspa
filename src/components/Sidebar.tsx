@@ -9,7 +9,7 @@ import { RoomListItem } from "./sidebar/RoomListItem.tsx";
 import { useRoomsContext } from "../utils/RoomsContext.tsx";
 import { useSlideContext } from "../utils/SlideContext.tsx";
 import { RiArrowDropDownLine } from "react-icons/ri";
-import { Version } from "./Version.tsx";
+// import { Version } from "./Version.tsx";
 
 export const Sidebar = () => {
   const { slide, onTouchStart, onTouchMove, onTouchEnd } = useSlideContext();
@@ -28,9 +28,9 @@ export const Sidebar = () => {
       <section
         className={"flex flex-col w-full h-full overflow-y-auto gap-4 px-8"}
       >
-        <h5>
-          <Version />
-        </h5>
+        {/*<h5>*/}
+        {/*  <Version />*/}
+        {/*</h5>*/}
         <h2
           className={
             "text-center flex justify-center items-center text-2xl gap-2"
