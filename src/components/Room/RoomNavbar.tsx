@@ -132,6 +132,9 @@ export default function RoomNavbar({
         </div>
       </div>
       <div className={"flex flex-row items-center gap-4"}>
+        <h3 className={"font-semibold"}>
+          Room's code: <span className={"text-primary"}>{room.$id}</span>
+        </h3>
         {room.call ? (
           inCall ? (
             <a

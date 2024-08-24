@@ -9,6 +9,7 @@ import { RoomListItem } from "./sidebar/RoomListItem.tsx";
 import { useRoomsContext } from "../utils/RoomsContext.tsx";
 import { useSlideContext } from "../utils/SlideContext.tsx";
 import { RiArrowDropDownLine } from "react-icons/ri";
+import { ThemeSelector } from "./ThemeSelector.tsx";
 // import { Version } from "./Version.tsx";
 
 export const Sidebar = () => {
@@ -123,6 +124,7 @@ export const Sidebar = () => {
             >
               <TbLogout2 />
             </Link>
+            <ThemeSelector />
           </div>
         </div>
       </section>
