@@ -10,7 +10,7 @@ import { useUserContext } from "../utils/UserContext.tsx";
 import { Query } from "appwrite";
 import { PhotoProvider } from "react-photo-view";
 import { RoomSkeleton } from "../components/Room/RoomSkeleton.tsx";
-import RoomNavbar from "../components/Room/RoomNavbar.tsx";
+import RoomNavbar, { leaveTheCall } from "../components/Room/RoomNavbar.tsx";
 import { LiveKitRoom } from "@livekit/components-react";
 import VideoConference from "../components/Room/VideoConference.tsx";
 import { CiMaximize1, CiMinimize1 } from "react-icons/ci";
@@ -99,22 +99,22 @@ export const Room = () => {
     fetchRoomData();
     fetchMessages(roomId);
 
-    // const unsubscribeRoom = client.subscribe(
-    //   `databases.${database}.collections.rooms.documents.${roomId}`,
-    //   (response) => {
-    //     const payload = response.payload as RoomObject;
-    //     console.log("NEW ROOM PAYLOAD", payload);
-    //     setRoom(payload);
-    //   },
-    // );
-    //
-    // return () => {
-    //   unsubscribeRoom();
-    // };
+    const unsubscribeRoom = client.subscribe(
+      `databases.${database}.collections.rooms.documents.${roomId}`,
+      (response) => {
+        const payload = response.payload as RoomObject;
+        setRoom(payload);
+      },
+    );
+
+    return () => {
+      unsubscribeRoom();
+    };
   }, [roomId]);
 
   useEffect(() => {
     if (room && room.$id) {
+      console.log("SUBSCRIBING");
       const unsubscribeMessages = client.subscribe(
         `databases.${database}.collections.messages.documents`,
         (response) => {
@@ -142,7 +142,7 @@ export const Room = () => {
         unsubscribeMessages();
       };
     }
-  }, [room?.$id, user]);
+  }, [room, user]);
 
   useEffect(() => {
     optimisticMessagesRef.current = optimisticMessages;
@@ -157,9 +157,10 @@ export const Room = () => {
 
   if (!room) return <FullscreenLoading />;
 
-  const handleOnDisconnectedFn = async () => {};
-  console.log("OPTIMISTIC REF:", optimisticMessagesRef.current);
-  console.log("OPTIMISTIC STATE:", optimisticMessages);
+  const handleOnDisconnectedFn = async () => {
+    setInCall(false);
+    await leaveTheCall(roomId);
+  };
 
   return (
     <section
