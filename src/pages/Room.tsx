@@ -13,8 +13,12 @@ import { RoomSkeleton } from "../components/Room/RoomSkeleton.tsx";
 import RoomNavbar, { leaveTheCall } from "../components/Room/RoomNavbar.tsx";
 import { LiveKitRoom } from "@livekit/components-react";
 import VideoConference from "../components/Room/VideoConference.tsx";
-import { CiMaximize1, CiMinimize1 } from "react-icons/ci";
+import { CiMaximize1, CiMinimize1, CiWarning } from "react-icons/ci";
 import { useSlideContext } from "../utils/SlideContext.tsx";
+import { FaUsers } from "react-icons/fa6";
+import { UserListItem } from "../components/Room/UserListItem.tsx";
+import { UserObject } from "../utils/interfaces/UserObject.ts";
+import { toast } from "react-toastify";
 
 export const Room = () => {
   const { user } = useUserContext();
@@ -32,6 +36,8 @@ export const Room = () => {
   const [fullscreenCall, setFullscreenCall] = useState<boolean>(false);
   const messagesSectionRef = useRef<HTMLDivElement>(null);
 
+  const [sidebar, setSidebar] = useState<boolean>(true);
+
   const { slide, onTouchStart, onTouchMove, onTouchEnd } = useSlideContext();
 
   const navigate = useNavigate();
@@ -45,6 +51,41 @@ export const Room = () => {
     const messages = res.documents as MessageObject[];
     setMessages(messages);
     setLoading(false);
+  };
+
+  const becomeAdmin = async (roomId: string) => {
+    const jwt = await account.createJWT();
+
+    const toastId = toast.loading("Giving you the room's admin role...");
+
+    const result = await fetch(
+      `${import.meta.env.VITE_PUBLIC_API_HOSTNAME}/becomeAdmin`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          jwt: jwt.jwt,
+          roomId: roomId,
+        }),
+      },
+    );
+    console.log(result);
+    const response = await result.json();
+    if (!response || !result.ok || !response.success)
+      return toast.update(toastId, {
+        render: "You can't become an administrator in this group.",
+        type: "error",
+        isLoading: false,
+        autoClose: 2000,
+      });
+    toast.update(toastId, {
+      render: "You are an admin in this group now.",
+      type: "success",
+      isLoading: false,
+      autoClose: 2000,
+    });
   };
 
   useEffect(() => {
@@ -169,8 +210,16 @@ export const Room = () => {
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
     >
-      <RoomNavbar room={room} inCall={inCall} setInCall={setInCall} />
-      <section className={"flex flex-col col-span-12 row-span-11"}>
+      <RoomNavbar
+        room={room}
+        inCall={inCall}
+        setInCall={setInCall}
+        sidebar={sidebar}
+        setSidebar={setSidebar}
+      />
+      <section
+        className={`flex flex-col ${sidebar ? "col-span-10" : "col-span-12"} row-span-11 transition-all`}
+      >
         {inCall && (
           <section
             className={`flex flex-col gap-[1dvw] bg-light transition-all duration-100 ${fullscreenCall ? "absolute w-[100dvw] h-[100dvh] top-0 left-0 z-50" : "relative w-full min-h-96 h-full"} resize-y overflow-auto`}
@@ -230,6 +279,39 @@ export const Room = () => {
           />
         </footer>
       </section>
+      <aside
+        className={`${sidebar ? "col-span-2 row-span-11" : "hidden"}  transition-all h-full flex flex-col p-4 w-full gap-4`}
+      >
+        <article className={"flex flex-col gap-2"}>
+          <h2
+            className={
+              "text-center flex justify-center items-center text-2xl gap-2"
+            }
+          >
+            <FaUsers /> Members ({room.users.length}){" "}
+            {!room.admin?.$id && (
+              <a
+                className={"text-yellow-500 text-2xl hover:cursor-pointer"}
+                title={
+                  "This room doesn't have any admin. Click to become a one."
+                }
+                onClick={() => becomeAdmin(room?.$id)}
+              >
+                <CiWarning />
+              </a>
+            )}
+          </h2>
+          <div className={"flex flex-col gap-2"}>
+            {room.users.map((listUser: UserObject) => (
+              <UserListItem
+                key={listUser.$id + "_userSidebarList"}
+                user={listUser}
+                admin={room.admin?.$id === listUser.$id}
+              />
+            ))}
+          </div>
+        </article>
+      </aside>
     </section>
   );
 };

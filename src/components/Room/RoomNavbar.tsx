@@ -17,6 +17,8 @@ interface RoomNavbarProps {
   room: RoomObject;
   inCall: boolean;
   setInCall: Dispatch<SetStateAction<boolean>>;
+  sidebar: boolean;
+  setSidebar: Dispatch<SetStateAction<boolean>>;
 }
 
 export const leaveTheCall = async (roomId: string) => {
@@ -43,6 +45,8 @@ export default function RoomNavbar({
   room,
   inCall,
   setInCall,
+  sidebar,
+  setSidebar,
 }: RoomNavbarProps) {
   const navigate = useNavigate();
   const { rooms, setRooms } = useRoomsContext();
@@ -118,9 +122,7 @@ export default function RoomNavbar({
 
   return (
     <nav
-      className={
-        "col-span-12 row-span-1 flex flex-row p-2 items-center mx-12 justify-between"
-      }
+      className={`col-span-12 row-span-1 flex flex-row p-2 items-center mx-12 justify-between transition-all`}
     >
       <div className={"flex flex-row gap-4"}>
         <Avatar />
@@ -157,6 +159,7 @@ export default function RoomNavbar({
         <a
           title={"Toggle users sidebar"}
           className={"text-4xl hover:cursor-pointer"}
+          onClick={() => setSidebar(!sidebar)}
         >
           <FaUsers />
         </a>
