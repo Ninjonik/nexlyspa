@@ -1,6 +1,6 @@
 import Avatar from "../Avatar.tsx";
 import RoomObject from "../../utils/interfaces/RoomObject.ts";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 interface RoomListItem {
   room: RoomObject;
