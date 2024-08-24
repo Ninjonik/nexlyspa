@@ -17,12 +17,36 @@ interface RoomNavbarProps {
   room: RoomObject;
   inCall: boolean;
   setInCall: Dispatch<SetStateAction<boolean>>;
+  sidebar: boolean;
+  setSidebar: Dispatch<SetStateAction<boolean>>;
 }
+
+export const leaveTheCall = async (roomId: string) => {
+  const jwt = await account.createJWT();
+
+  const result = await fetch(
+    `${import.meta.env.VITE_PUBLIC_API_HOSTNAME}/checkCallStatus`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        jwt: jwt.jwt,
+        roomId: roomId,
+      }),
+    },
+  );
+  const response = await result.json();
+  if (!response || !result.ok || !response.success) return;
+};
 
 export default function RoomNavbar({
   room,
   inCall,
   setInCall,
+  sidebar,
+  setSidebar,
 }: RoomNavbarProps) {
   const navigate = useNavigate();
   const { rooms, setRooms } = useRoomsContext();
@@ -64,6 +88,11 @@ export default function RoomNavbar({
     navigate("/home");
   };
 
+  const handleLeaveCall = async (roomId: string) => {
+    setInCall(false);
+    return await leaveTheCall(roomId);
+  };
+
   const startACall = async (roomId: string) => {
     try {
       const jwt = await account.createJWT();
@@ -91,32 +120,9 @@ export default function RoomNavbar({
     }
   };
 
-  const leaveTheCall = async (roomId: string) => {
-    setInCall(false);
-    const jwt = await account.createJWT();
-
-    const result = await fetch(
-      `${import.meta.env.VITE_PUBLIC_API_HOSTNAME}/checkCallStatus`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          jwt: jwt.jwt,
-          roomId: roomId,
-        }),
-      },
-    );
-    const response = await result.json();
-    if (!response || !result.ok || !response.success) return;
-  };
-
   return (
     <nav
-      className={
-        "col-span-12 row-span-1 flex flex-row p-2 items-center mx-12 justify-between"
-      }
+      className={`col-span-12 row-span-1 flex flex-row p-2 items-center mx-12 justify-between transition-all`}
     >
       <div className={"flex flex-row gap-4"}>
         <Avatar />
@@ -129,7 +135,7 @@ export default function RoomNavbar({
         {room.call ? (
           inCall ? (
             <a
-              onClick={() => leaveTheCall(room.$id)}
+              onClick={() => handleLeaveCall(room.$id)}
               title={"Hang"}
               className={"text-4xl hover:cursor-pointer"}
             >
@@ -153,6 +159,7 @@ export default function RoomNavbar({
         <a
           title={"Toggle users sidebar"}
           className={"text-4xl hover:cursor-pointer"}
+          onClick={() => setSidebar(!sidebar)}
         >
           <FaUsers />
         </a>

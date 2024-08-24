@@ -1,4 +1,5 @@
 import MessageObject from "./MessageObject.ts";
+import { UserObject } from "./UserObject.ts";
 
 export default interface RoomObject {
   name: string;
@@ -6,6 +7,8 @@ export default interface RoomObject {
   description: string;
   avatar: string;
   call: boolean;
+  users: UserObject[];
+  admin?: UserObject;
   $id: string;
   $createdAt: string;
   $updatedAt: string;
@@ -19,6 +22,4 @@ export interface RoomObjectArray {
   [roomId: string]: RoomObject;
 }
 
-export interface RoomObjectArray {
-
-}
+export interface RoomObjectArray {}

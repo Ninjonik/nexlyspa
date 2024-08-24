@@ -22,6 +22,7 @@ dotenv.config({ path: `${__dirname}/.env` });
 import fs from "fs";
 import http from "http";
 import https from "https";
+import becomeAdmin from "./routes/becomeAdmin.js";
 
 const privKey = process.env.SSL_PRIV_KEY;
 const cert = process.env.SSL_CERT;
@@ -52,6 +53,7 @@ if (privKey && cert) {
 // Start server
 
 app.use(checkCallStatus);
+app.use(becomeAdmin);
 app.use(checkRoom);
 app.use(createRoom);
 app.use(deleteUser);
