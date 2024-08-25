@@ -12,6 +12,8 @@ yarn dev
 pnpm dev
 # or - the best
 bun dev
+
+node server/index.js
 ```
 
 Docker: soon
