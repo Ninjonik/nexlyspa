@@ -12,6 +12,7 @@ import { Dispatch, SetStateAction } from "react";
 import { ImPhoneHangUp } from "react-icons/im";
 import { TbPhonePlus } from "react-icons/tb";
 import { toast } from "react-toastify";
+import { Button } from "../../Button.tsx";
 
 interface RoomNavbarProps {
   room: RoomObject;
@@ -137,42 +138,55 @@ export default function RoomNavbar({
         </h3>
         {room.call ? (
           inCall ? (
-            <a
+            <Button
               onClick={() => handleLeaveCall(room.$id)}
-              title={"Hang"}
+              text={"Hang"}
               className={"text-4xl hover:cursor-pointer"}
+              transparent={true}
+              position={"bottom"}
             >
               <ImPhoneHangUp />
-            </a>
+            </Button>
           ) : (
-            <a title={"Join Call"} className={"text-4xl hover:cursor-pointer"}>
+            <Button
+              text={"Join Call"}
+              className={"text-4xl hover:cursor-pointer"}
+              transparent={true}
+              position={"bottom"}
+            >
               <TbPhonePlus onClick={() => setInCall(true)} />
-            </a>
+            </Button>
           )
         ) : (
-          <a
+          <Button
             onClick={() => startACall(room.$id)}
-            title={"Call"}
+            text={"Call"}
             className={"text-4xl hover:cursor-pointer"}
+            transparent={true}
+            position={"bottom"}
           >
             <MdCall />
-          </a>
+          </Button>
         )}
 
-        <a
-          title={"Toggle users sidebar"}
+        <Button
+          text={"Toggle users sidebar"}
           className={"text-4xl hover:cursor-pointer"}
+          transparent={true}
+          position={"bottom"}
           onClick={() => setSidebar(!sidebar)}
         >
           <FaUsers />
-        </a>
-        <a
-          title={"Leave the room"}
+        </Button>
+        <Button
+          text={"Leave the room"}
           className={"text-4xl hover:cursor-pointer"}
+          transparent={true}
+          position={"bottom"}
           onClick={() => leaveRoom(room.$id)}
         >
           <IoMdExit />
-        </a>
+        </Button>
       </div>
     </nav>
   );

@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 // @ts-expect-error erroneous due to outdated react types, will be fixed with react 19
 import { useActionState } from "react";
@@ -7,6 +8,7 @@ import { account } from "../utils/appwrite.ts";
 import { useUserContext } from "../utils/UserContext.tsx";
 import { UserAuthObject } from "../utils/interfaces/UserObject.ts";
 import { toast } from "react-toastify";
+import { pageTransitionOptions } from "../utils/constants.ts";
 
 export const Login = () => {
   const { getUserData, logoutUser } = useUserContext();
@@ -23,10 +25,20 @@ export const Login = () => {
       await account.createEmailPasswordSession(email, password);
       const newAccount = (await account.get()) as UserAuthObject;
       await getUserData(newAccount);
-      toast.update(toastId, {render: "Successfully logged you in!", type: "success", isLoading: false, autoClose: 2000});
+      toast.update(toastId, {
+        render: "Successfully logged you in!",
+        type: "success",
+        isLoading: false,
+        autoClose: 2000,
+      });
       navigate("/home");
     } catch (e) {
-      toast.update(toastId, {render: "Invalid email/password.", type: "error", isLoading: false, autoClose: 2000});
+      toast.update(toastId, {
+        render: "Invalid email/password.",
+        type: "error",
+        isLoading: false,
+        autoClose: 2000,
+      });
       return "Invalid email/password.";
     }
   };
@@ -35,10 +47,11 @@ export const Login = () => {
 
   return (
     <main className="w-screen h-screen flex justify-center items-center bg-[url('/img/background.svg')] bg-cover">
-      <section
+      <motion.section
         className={
-          "h-full w-full md:h-auto md:w-auto p-8 flex flex-col justify-center items-center bg-base-100 rounded-lg shadow-md text-center gap-4"
+          "h-full md:h-auto md:w-auto p-8 flex flex-col justify-center items-center bg-base-100 rounded-lg shadow-md text-center gap-4"
         }
+        {...pageTransitionOptions}
       >
         <h2>Welcome back!</h2>
         <h3>We're so excited to see you again!</h3>
@@ -68,7 +81,7 @@ export const Login = () => {
             <Link to={"/register"}>Register</Link>
           </span>
         </form>
-      </section>
+      </motion.section>
     </main>
   );
 };

@@ -10,12 +10,18 @@ import { useRoomsContext } from "../utils/RoomsContext.tsx";
 import { useSlideContext } from "../utils/SlideContext.tsx";
 import { RiArrowDropDownLine } from "react-icons/ri";
 import { ThemeSelector } from "./ThemeSelector.tsx";
+import { Anchor } from "./Anchor.tsx";
+import { Settings } from "../pages/Settings.tsx";
+import { useState } from "react";
+import { Button } from "../Button.tsx";
 // import { Version } from "./Version.tsx";
 
 export const Sidebar = () => {
   const { slide, onTouchStart, onTouchMove, onTouchEnd } = useSlideContext();
   const { user } = useUserContext();
   const { rooms } = useRoomsContext();
+
+  const [shownSettings, setShownSettings] = useState<boolean>(false);
 
   if (!user) return <FullscreenLoading />;
 
@@ -26,6 +32,7 @@ export const Sidebar = () => {
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
     >
+      <Settings shown={shownSettings} setShown={setShownSettings} />
       <section
         className={"flex flex-col w-full h-full overflow-y-auto gap-4 px-8"}
       >
@@ -70,31 +77,31 @@ export const Sidebar = () => {
               className="dropdown-content z-50 menu p-2 shadow bg-base-100 rounded-box"
             >
               <li>
-                <Link
+                <Anchor
                   to={"/register/verify"}
                   className={"font-bold text-xl"}
                   title={"Verify your account"}
                 >
                   <IoMdCheckmarkCircle />
-                </Link>
+                </Anchor>
               </li>
               <li>
-                <Link
+                <Anchor
                   to={"/logout"}
                   className={"font-bold text-xl"}
                   title={"Settings"}
                 >
                   <FaGear />
-                </Link>
+                </Anchor>
               </li>
               <li>
-                <Link
+                <Anchor
                   to={"/logout"}
                   className={"font-bold text-xl"}
                   title={"Log out"}
                 >
                   <TbLogout2 />
-                </Link>
+                </Anchor>
               </li>
             </ul>
           </div>
@@ -103,27 +110,27 @@ export const Sidebar = () => {
               "flex sm:hidden lg:flex flex-row gap-4 justify-end items-center w-1/3"
             }
           >
-            <Link
+            <Anchor
               to={"/register/verify"}
               className={"font-bold text-xl"}
               title={"Verify your account"}
             >
               <IoMdCheckmarkCircle />
-            </Link>
-            <Link
-              to={"/logout"}
-              className={"font-bold text-xl"}
-              title={"Settings"}
+            </Anchor>
+            <Button
+              className={"font-bold text-xl transparent-button"}
+              text={"Settings"}
+              onClick={() => setShownSettings(true)}
             >
               <FaGear />
-            </Link>
-            <Link
+            </Button>
+            <Anchor
               to={"/logout"}
               className={"font-bold text-xl"}
               title={"Log out"}
             >
               <TbLogout2 />
-            </Link>
+            </Anchor>
             <ThemeSelector />
           </div>
         </div>

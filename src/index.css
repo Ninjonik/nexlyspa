@@ -13,10 +13,10 @@
   a {
     @apply text-primary underline hover:brightness-90;
   }
-  button {
+  button:not(.transparent-button, .lk-button, .lk-disconnect-button) {
     @apply btn btn-primary;
   }
-  input {
+  input:not(.input-default){
     @apply input input-primary
   }
 }
@@ -43,4 +43,35 @@
   display: inline;
   padding-right: 1%;
   height: 1.5rem;
+}
+
+.transparent-button {
+  @apply text-primary hover:brightness-90;
+}
+
+.sidebar-icon {
+  @apply relative flex items-center justify-center mx-auto
+  cursor-pointer text-primary hover:brightness-90;
+}
+.sidebar-tooltip {
+  @apply absolute w-auto p-2 m-2 min-w-max rounded-md shadow-md
+  text-white bg-gray-900
+  text-xs font-bold
+  transition-all duration-100 scale-0 origin-left;
+}
+
+.sidebar-top {
+  @apply -top-12
+}
+
+.sidebar-bottom {
+  @apply -bottom-12
+}
+
+.sidebar-left {
+  @apply -left-12
+}
+
+.sidebar-right {
+  @apply -right-12
 }

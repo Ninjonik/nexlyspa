@@ -19,6 +19,8 @@ import { FaUsers } from "react-icons/fa6";
 import { UserListItem } from "../components/Room/UserListItem.tsx";
 import { UserObject } from "../utils/interfaces/UserObject.ts";
 import { toast } from "react-toastify";
+import { motion } from "framer-motion";
+import { pageTransitionOptions } from "../utils/constants.ts";
 
 export const Room = () => {
   const { user } = useUserContext();
@@ -204,11 +206,12 @@ export const Room = () => {
   };
 
   return (
-    <section
+    <motion.section
       className={`grid grid-cols-12 grid-rows-12 w-full h-full overflow-hidden ${slide === "main" ? "" : "_md:hidden"}`}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
+      {...pageTransitionOptions}
     >
       <RoomNavbar
         room={room}
@@ -238,7 +241,7 @@ export const Room = () => {
                 handleOnDisconnectedFn={handleOnDisconnectedFn}
               />
               <button
-                className="bg-transparent hover:bg-transparent border-none h-[2dvw] w-[2dvw] p-[1dvw] text-lightly hover:text-white transition-all flex justify-center items-center text-center rounded-xl absolute left-4 bottom-4 md:left-1 md:bottom-1"
+                className="transparent-button bg-transparent hover:bg-transparent border-none h-[2dvw] w-[2dvw] p-[1dvw] text-lightly hover:text-white transition-all flex justify-center items-center text-center rounded-xl absolute left-4 bottom-4 md:left-1 md:bottom-1"
                 onClick={() => setFullscreenCall(!fullscreenCall)}
               >
                 <label className="swap swap-rotate text-white hover:text-secondary ease-in transition-all text-xl">
@@ -312,6 +315,6 @@ export const Room = () => {
           </div>
         </article>
       </aside>
-    </section>
+    </motion.section>
   );
 };

@@ -32,9 +32,9 @@ export const ThemeSelector = () => {
       onClick={handleToggle}
     >
       {theme === "light" ? (
-        <FaSun className="w-8 h-8 swap-on" />
+        <FaSun className="swap-on" />
       ) : (
-        <FaMoon className="w-8 h-8 swap-off" />
+        <FaMoon className="swap-off" />
       )}
     </a>
   );
