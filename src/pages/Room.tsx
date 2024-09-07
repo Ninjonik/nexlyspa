@@ -238,7 +238,7 @@ export const Room = () => {
                 handleOnDisconnectedFn={handleOnDisconnectedFn}
               />
               <button
-                className="bg-transparent hover:bg-transparent border-none h-[2dvw] w-[2dvw] p-[1dvw] text-lightly hover:text-white transition-all flex justify-center items-center text-center rounded-xl absolute left-4 bottom-4 md:left-1 md:bottom-1"
+                className="transparent-button bg-transparent hover:bg-transparent border-none h-[2dvw] w-[2dvw] p-[1dvw] text-lightly hover:text-white transition-all flex justify-center items-center text-center rounded-xl absolute left-4 bottom-4 md:left-1 md:bottom-1"
                 onClick={() => setFullscreenCall(!fullscreenCall)}
               >
                 <label className="swap swap-rotate text-white hover:text-secondary ease-in transition-all text-xl">
