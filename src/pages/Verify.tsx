@@ -1,8 +1,10 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { account } from "../utils/appwrite.ts";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { pageTransitionOptions } from "../utils/constants.ts";
 
 export const Verify = () => {
   const [message, setMessage] = useState<string>("");
@@ -55,10 +57,11 @@ export const Verify = () => {
 
   return (
     <main className="w-screen h-screen flex justify-center items-center bg-[url('/img/background.svg')] bg-cover">
-      <section
+      <motion.section
         className={
           "h-full md:h-auto md:w-auto p-8 flex flex-col justify-center items-center bg-base-100 rounded-lg shadow-md text-center gap-4"
         }
+        {...pageTransitionOptions}
       >
         <h2>Email Verification!</h2>
         <h3>You verifying your email grants you some additional bonuses!</h3>
@@ -67,7 +70,7 @@ export const Verify = () => {
           <button onClick={verifyAccount}>Verify your account</button>
         )}
         <Link to={"/"}>Back</Link>
-      </section>
+      </motion.section>
     </main>
   );
 };

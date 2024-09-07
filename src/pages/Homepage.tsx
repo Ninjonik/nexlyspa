@@ -5,6 +5,8 @@ import { useUserContext } from "../utils/UserContext.tsx";
 import { useNavigate } from "react-router-dom";
 import { toast, Id } from "react-toastify";
 import { useSlideContext } from "../utils/SlideContext.tsx";
+import { motion } from "framer-motion";
+import { pageTransitionOptions } from "../utils/constants.ts";
 
 export const Homepage = () => {
   const [pending, setPending] = useState<boolean>(false);
@@ -119,11 +121,12 @@ export const Homepage = () => {
 
   console.info(pending);
   return (
-    <section
+    <motion.section
       className={`md:visible h-full bg-base-200 flex flex-col gap-8 md:w-4/5 md:p-8 ${slide === "main" ? "w-full p-8" : "_md:hidden p-0"}`}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
+      {...pageTransitionOptions}
     >
       <h2 className={"text-center text-5xl"}>Nexly</h2>
       <hr className={"divider divider-primary"} />
@@ -179,6 +182,6 @@ export const Homepage = () => {
       </div>
       <span className={"text-primary"}>{messageJoin}</span>
       <span className={"text-primary"}>{messageCreate}</span>
-    </section>
+    </motion.section>
   );
 };

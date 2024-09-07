@@ -1,3 +1,6 @@
+import { motion } from "framer-motion";
+import { pageTransitionOptions } from "../../utils/constants.ts";
+
 export const RoomSkeleton = () => {
   const heightClasses = [
     "h-40",
@@ -11,10 +14,11 @@ export const RoomSkeleton = () => {
   const widthClasses = ["w-40", "w-48", "w-56", "w-64", "w-72", "w-80", "w-96"];
 
   return (
-    <section
+    <motion.section
       className={
         "grid grid-cols-12 grid-rows-12 w-full h-full overflow-hidden animate-pulse"
       }
+      {...pageTransitionOptions}
     >
       <nav
         className={
@@ -57,6 +61,6 @@ export const RoomSkeleton = () => {
           <div className={"w-full h-24 rounded-lg bg-base-300"}></div>
         </footer>
       </section>
-    </section>
+    </motion.section>
   );
 };

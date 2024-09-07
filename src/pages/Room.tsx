@@ -19,6 +19,8 @@ import { FaUsers } from "react-icons/fa6";
 import { UserListItem } from "../components/Room/UserListItem.tsx";
 import { UserObject } from "../utils/interfaces/UserObject.ts";
 import { toast } from "react-toastify";
+import { motion } from "framer-motion";
+import { pageTransitionOptions } from "../utils/constants.ts";
 
 export const Room = () => {
   const { user } = useUserContext();
@@ -204,11 +206,12 @@ export const Room = () => {
   };
 
   return (
-    <section
+    <motion.section
       className={`grid grid-cols-12 grid-rows-12 w-full h-full overflow-hidden ${slide === "main" ? "" : "_md:hidden"}`}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
+      {...pageTransitionOptions}
     >
       <RoomNavbar
         room={room}
@@ -312,6 +315,6 @@ export const Room = () => {
           </div>
         </article>
       </aside>
-    </section>
+    </motion.section>
   );
 };

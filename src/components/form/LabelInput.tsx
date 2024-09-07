@@ -1,6 +1,4 @@
 import { ReactNode } from "react";
-import { toast } from "react-toastify";
-import onChange = toast.onChange;
 
 interface LabelInputProps {
   placeholder: string;
@@ -17,8 +15,8 @@ interface LabelInputProps {
   defaultValue?: string | number;
   className?: string;
   icon?: ReactNode;
-  value?: any;
-  onChange?: (value: any) => void;
+  value?: never;
+  onChange?: (value: never) => void;
 }
 
 export const LabelInput = ({

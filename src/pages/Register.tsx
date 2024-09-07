@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 // @ts-expect-error erroneous due to outdated react types, will be fixed with react 19
 import { useActionState } from "react";
@@ -7,6 +8,7 @@ import { account } from "../utils/appwrite.ts";
 import { useUserContext } from "../utils/UserContext.tsx";
 import { UserAuthObject } from "../utils/interfaces/UserObject.ts";
 import { ID } from "appwrite";
+import { pageTransitionOptions } from "../utils/constants.ts";
 
 export const Register = () => {
   const { getUserData, logoutUser } = useUserContext();
@@ -34,10 +36,11 @@ export const Register = () => {
 
   return (
     <main className="w-screen h-screen flex justify-center items-center bg-[url('/img/background.svg')] bg-cover">
-      <section
+      <motion.section
         className={
-          "h-full w-full md:h-auto md:w-auto p-8 flex flex-col justify-center items-center bg-base-100 rounded-lg shadow-md text-center gap-4"
+          "h-full md:h-auto md:w-auto p-8 flex flex-col justify-center items-center bg-base-100 rounded-lg shadow-md text-center gap-4"
         }
+        {...pageTransitionOptions}
       >
         <h2>Welcome to Nexly!</h2>
         <h3>We're so excited to meet you!</h3>
@@ -72,7 +75,7 @@ export const Register = () => {
             <Link to={"/login"}>Log in</Link>
           </span>
         </form>
-      </section>
+      </motion.section>
     </main>
   );
 };
