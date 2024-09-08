@@ -13,6 +13,7 @@ import {
   UserObject,
 } from "./interfaces/UserObject.ts";
 import { useLocation, useNavigate } from "react-router-dom";
+import { Permission, Role } from "appwrite";
 
 interface UserContextState {
   user: UserCombinedObject | null;
@@ -82,6 +83,10 @@ export const UserContextProvider = ({ children }: UserContextProps) => {
           name: userAccount.name,
           avatar: "defaultAvatar",
         },
+        [
+          Permission.read(Role.user(userAccount.$id)),
+          Permission.update(Role.user(userAccount.$id)),
+        ],
       )) as UserObject;
       const combinedUserObject: UserCombinedObject = {
         ...userAccount,

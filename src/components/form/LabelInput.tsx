@@ -15,8 +15,8 @@ interface LabelInputProps {
   defaultValue?: string | number;
   className?: string;
   icon?: ReactNode;
-  value?: never;
-  onChange?: (value: never) => void;
+  value?: any;
+  onChange?: (value: any) => void;
 }
 
 export const LabelInput = ({

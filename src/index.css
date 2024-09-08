@@ -10,14 +10,14 @@
   h3 {
     @apply text-lg;
   }
-  a {
+  a:not(.transparent-link) {
     @apply text-primary underline hover:brightness-90;
   }
-  button:not(.transparent-button, .lk-button, .lk-disconnect-button) {
-    @apply btn btn-primary;
+  .button:not(.transparent-button, .lk-button, .lk-disconnect-button) {
+    @apply btn btn-primary border-none outline-none focus:outline-none focus:border-primary;
   }
   input:not(.input-default){
-    @apply input input-primary
+    @apply input input-primary border-none outline-none focus:outline-none focus:border-primary
   }
 }
 
@@ -57,7 +57,7 @@
   @apply absolute w-auto p-2 m-2 min-w-max rounded-md shadow-md
   text-white bg-gray-900
   text-xs font-bold
-  transition-all duration-100 scale-0 origin-left;
+  transition-all duration-100 scale-0 origin-left z-50;
 }
 
 .sidebar-top {
@@ -69,7 +69,7 @@
 }
 
 .sidebar-left {
-  @apply -left-12
+  @apply -left-44
 }
 
 .sidebar-right {

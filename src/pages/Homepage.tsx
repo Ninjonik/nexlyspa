@@ -147,7 +147,7 @@ export const Homepage = () => {
                 required={true}
               />
             </div>
-            <button type="submit" disabled={pending}>
+            <button className={"button"} type="submit" disabled={pending}>
               Join an existing room
             </button>
           </form>
@@ -174,7 +174,7 @@ export const Homepage = () => {
                 required={true}
               />
             </div>
-            <button type="submit" disabled={pending}>
+            <button className={"button"} type="submit" disabled={pending}>
               Create a new room
             </button>
           </form>

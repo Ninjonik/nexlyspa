@@ -21,6 +21,7 @@ import { UserObject } from "../utils/interfaces/UserObject.ts";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
 import { pageTransitionOptions } from "../utils/constants.ts";
+import fireToast from "../utils/fireToast.ts";
 
 export const Room = () => {
   const { user } = useUserContext();
@@ -205,6 +206,16 @@ export const Room = () => {
     await leaveTheCall(roomId);
   };
 
+  const isUserAdmin = room.admin?.$id === user?.$id;
+
+  const kickUserOut = async (userId: string) => {
+    const newRoomUsers = room.users.filter((user) => user.$id !== userId);
+    await databases.updateDocument(database, "rooms", roomId, {
+      users: newRoomUsers,
+    });
+    fireToast("success", "User has been successfully kicked out of the room!");
+  };
+
   return (
     <motion.section
       className={`grid grid-cols-12 grid-rows-12 w-full h-full overflow-hidden ${slide === "main" ? "" : "_md:hidden"}`}
@@ -310,6 +321,8 @@ export const Room = () => {
                 key={listUser.$id + "_userSidebarList"}
                 user={listUser}
                 admin={room.admin?.$id === listUser.$id}
+                isUserAdmin={isUserAdmin}
+                kickUserOut={kickUserOut}
               />
             ))}
           </div>

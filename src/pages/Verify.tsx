@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { account } from "../utils/appwrite.ts";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { pageTransitionOptions } from "../utils/constants.ts";
+import fireToast from "../utils/fireToast.ts";
 
 export const Verify = () => {
   const [message, setMessage] = useState<string>("");
@@ -22,6 +23,7 @@ export const Verify = () => {
 
     try {
       await account.updateVerification(userId, secret);
+      fireToast("success", "Your account has been successfully verified!");
       navigate("/home");
     } catch (e) {
       setMessage(
@@ -67,7 +69,9 @@ export const Verify = () => {
         <h3>You verifying your email grants you some additional bonuses!</h3>
         <h4 className={"text-teal-500 text-semibold"}>{message}</h4>
         {!userId && (
-          <button onClick={verifyAccount}>Verify your account</button>
+          <button className={"button"} onClick={verifyAccount}>
+            Verify your account
+          </button>
         )}
         <Link to={"/"}>Back</Link>
       </motion.section>
