@@ -73,7 +73,7 @@ export const Login = () => {
           <Link to={"/login/anonymous"}>
             Continue with a one-time anonymous account?
           </Link>
-          <button type={"submit"} className={"w-full"}>
+          <button type={"submit"} className={"w-full button"}>
             Log in
           </button>
           <span>

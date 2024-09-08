@@ -5,7 +5,8 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   className?: string;
   transparent?: boolean;
   position?: "bottom" | "top" | "left" | "right";
-  text: string;
+  text?: string;
+  hideText?: boolean;
 }
 
 export const Button = ({
@@ -13,7 +14,8 @@ export const Button = ({
   className,
   transparent = false,
   position = "top",
-  text,
+  text = "",
+  hideText = false,
   ...props
 }: ButtonProps) => {
   // @ts-expect-error it's here just so tailwind doesn't garbage collect these classes
@@ -27,15 +29,17 @@ export const Button = ({
 
   return (
     <button
-      className={`sidebar-icon group ${transparent && "transparent-button"} ${className}`}
+      className={`sidebar-icon group button ${transparent && "transparent-button"} ${className}`}
       {...props}
     >
       {children}
-      <span
-        className={`sidebar-tooltip sidebar-${position} group-hover:scale-100 no-underline`}
-      >
-        {text}
-      </span>
+      {!hideText && (
+        <span
+          className={`sidebar-tooltip sidebar-${position} group-hover:scale-100 no-underline`}
+        >
+          {text}
+        </span>
+      )}
     </button>
   );
 };
