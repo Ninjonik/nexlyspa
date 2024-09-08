@@ -54,7 +54,7 @@ export const LoginAnonymous = () => {
             required={true}
           />
           <Link to={"/login"}>Log in with normal account</Link>
-          <button type={"submit"} className={"w-full"}>
+          <button type={"submit"} className={"w-full button"}>
             Create a temporary anonymous account
           </button>
           <span>

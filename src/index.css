@@ -17,7 +17,7 @@
     @apply btn btn-primary border-none outline-none focus:outline-none focus:border-primary;
   }
   input:not(.input-default){
-    @apply input input-primary border-none outline-none focus:outline-none focus:border-primary
+    @apply input input-primary
   }
 }
 
