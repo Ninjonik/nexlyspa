@@ -67,7 +67,7 @@ export const Register = () => {
           <Link to={"/login/anonymous"}>
             Continue with a one-time anonymous account?
           </Link>
-          <button type={"submit"} className={"w-full"}>
+          <button type={"submit"} className={"w-full button"}>
             Create a new account
           </button>
           <span>
