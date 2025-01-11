@@ -267,7 +267,7 @@ export const Room = () => {
           >
             <LiveKitRoom
               video={false}
-              audio={false}
+              audio={localStorage.getItem("muted") === "true"}
               connect={inCall}
               token={token}
               serverUrl={import.meta.env.VITE_PUBLIC_LIVEKIT_URL}

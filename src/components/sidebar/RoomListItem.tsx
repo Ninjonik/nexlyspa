@@ -2,15 +2,12 @@ import Avatar from "../Avatar.tsx";
 import RoomObject from "../../utils/interfaces/RoomObject.ts";
 import { useLocation, useNavigate } from "react-router-dom";
 import truncate from "../../utils/truncate.ts";
-import {
-  Menu,
-  // Separator,
-  // Submenu,
-  Item,
-  useContextMenu,
-} from "react-contexify";
+import { Item, Menu, Separator, useContextMenu } from "react-contexify";
 import { leaveRoom } from "../Room/RoomNavbar.tsx";
 import { useRoomsContext } from "../../utils/RoomsContext.tsx";
+import { useState } from "react";
+import { RoomSettings } from "../Room/RoomSettings.tsx";
+import { useUserContext } from "../../utils/UserContext.tsx";
 
 interface RoomListItem {
   room: RoomObject;
@@ -20,12 +17,17 @@ export const RoomListItem = ({ room }: RoomListItem) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { rooms, setRooms } = useRoomsContext();
+  const [roomSettings, setRoomSettings] = useState<boolean>(false);
+
+  const { user } = useUserContext();
 
   const menuId = `room_${room.$id}_cm`;
 
   const { show } = useContextMenu({
     id: menuId,
   });
+
+  if (!user) return;
 
   return (
     <>
@@ -36,12 +38,11 @@ export const RoomListItem = ({ room }: RoomListItem) => {
         onClick={() => navigate("/room/" + room.$id)}
         onContextMenu={(event) => {
           event.preventDefault();
-          console.log("NIGGA SHOWING");
           show({ event, props: { key: "value" } });
         }}
       >
         <div className={"flex flex-row gap-4"}>
-          <Avatar />
+          <Avatar avatarId={room.avatar} />
           <div className={"flex flex-col text-start justify-center"}>
             <h3 className={"text-primary font-bold"}>
               {truncate(room.name, 15)}
@@ -53,7 +54,26 @@ export const RoomListItem = ({ room }: RoomListItem) => {
           <span className={"font-bold"}>{room.closed}</span>
         </div>
       </div>
+      {room?.admin && room?.admin?.$id === user.$id && (
+        <RoomSettings
+          shown={roomSettings}
+          setShown={setRoomSettings}
+          room={room}
+        />
+      )}
+
       <Menu id={menuId}>
+        {room?.admin && room?.admin?.$id === user.$id && (
+          <>
+            <Item
+              id={`settings_${menuId}`}
+              onClick={() => setRoomSettings(true)}
+            >
+              Edit Room Settings
+            </Item>
+            <Separator />
+          </>
+        )}
         <Item
           id={`leave_${menuId}`}
           onClick={async () => {
@@ -65,11 +85,12 @@ export const RoomListItem = ({ room }: RoomListItem) => {
               location.pathname,
             );
           }}
+          className={"text-red-500"}
         >
-          Leave
+          Leave Room
         </Item>
         {/*        <Item id="cut">Cut</Item>
-        <Separator />
+
         <Item disabled>Disabled</Item>
         <Separator />
         <Submenu label="Foobar">

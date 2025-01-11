@@ -1,7 +1,7 @@
 import Avatar from "./Avatar.tsx";
 import { Link } from "react-router-dom";
-import { FaGear, FaHeadphones, FaMicrophone } from "react-icons/fa6";
-import { TbMessages } from "react-icons/tb";
+import { FaGear } from "react-icons/fa6";
+import { TbHeadphones, TbHeadphonesOff, TbMessages } from "react-icons/tb";
 import { useUserContext } from "../utils/UserContext.tsx";
 import { FullscreenLoading } from "./FullscreenLoading.tsx";
 import { RoomListItem } from "./sidebar/RoomListItem.tsx";
@@ -12,6 +12,7 @@ import { Settings } from "../pages/Settings.tsx";
 import { useState } from "react";
 import { Button } from "../Button.tsx";
 import truncate from "../utils/truncate.ts";
+import { PiMicrophoneFill, PiMicrophoneSlashFill } from "react-icons/pi";
 // import { Version } from "./Version.tsx";
 
 export const Sidebar = () => {
@@ -20,6 +21,43 @@ export const Sidebar = () => {
   const { rooms } = useRoomsContext();
 
   const [shownSettings, setShownSettings] = useState<boolean>(false);
+  const [muted, setMuted] = useState<boolean>(
+    localStorage.getItem("muted") === "true",
+  );
+  const [deaf, setDeaf] = useState<boolean>(
+    localStorage.getItem("deaf") === "true",
+  );
+
+  const setLocalStorageSettings = async (key: string, value?: string) => {
+    if (!value) {
+      const current = localStorage.getItem(key) === "true" ?? false;
+      switch (key) {
+        case "muted":
+          console.log(current);
+          if (current) {
+            await navigator.mediaDevices
+              .getUserMedia({ audio: true })
+              .then(() => {
+                setMuted(!current);
+                localStorage.setItem(key, String(!current));
+              })
+              .catch(() => {});
+          } else {
+            localStorage.setItem(key, String(!current));
+            setMuted(!current);
+          }
+          break;
+        case "deaf":
+          localStorage.setItem(key, String(!current));
+          setDeaf(!current);
+          break;
+        default:
+          break;
+      }
+      return;
+    }
+    localStorage.setItem(key, value);
+  };
 
   if (!user) return <FullscreenLoading />;
 
@@ -27,17 +65,17 @@ export const Sidebar = () => {
     <>
       <Button
         className={"font-bold text-xl transparent-button"}
-        text={"Mute/Unmute"}
-        onClick={() => setShownSettings(true)}
+        text={muted ? "Unmute" : "Mute"}
+        onClick={() => setLocalStorageSettings("muted")}
       >
-        <FaMicrophone />
+        {muted ? <PiMicrophoneSlashFill /> : <PiMicrophoneFill />}
       </Button>
       <Button
         className={"font-bold text-xl transparent-button"}
-        text={"Deafen/Undeafen"}
-        onClick={() => setShownSettings(true)}
+        text={deaf ? "Undeafen" : "Deafen"}
+        onClick={() => setLocalStorageSettings("deaf")}
       >
-        <FaHeadphones />
+        {deaf ? <TbHeadphonesOff /> : <TbHeadphones />}
       </Button>
       <Button
         className={"font-bold text-xl transparent-button"}

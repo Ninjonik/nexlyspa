@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { database, databases } from "../utils/appwrite.ts";
 import { useUserContext } from "../utils/UserContext.tsx";
 
@@ -10,19 +10,29 @@ const updateUserHeatbeat = async (userId: string) => {
 
 const HeartbeatService = () => {
   const { user } = useUserContext();
+  const hasInitialized = useRef(false);
+
+  const updateHeartbeat = async () => {
+    if (user) {
+      console.info("Updating user heartbeat");
+      await updateUserHeatbeat(user.$id);
+    } else {
+      console.log("NOT USER:", user);
+    }
+  };
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      if (user) {
-        console.info("Updating user heartbeat");
-        updateUserHeatbeat(user.$id);
-      } else {
-        console.log("NOT USER:", user);
-      }
-    }, 60 * 1000);
+    if (!user || !user.$id) return;
+
+    if (!hasInitialized.current) {
+      updateHeartbeat();
+      hasInitialized.current = true;
+    }
+
+    const interval = setInterval(updateHeartbeat, 60 * 1000);
 
     return () => clearInterval(interval);
-  }, [user]);
+  }, [user?.$id]);
 
   return null;
 };

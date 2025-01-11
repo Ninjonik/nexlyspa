@@ -61,7 +61,7 @@ export const Message = ({ message }: MessageInterface) => {
     <div
       className={`max-w-2/3 flex flex-row gap-4 ${own && "place-self-end"} ${message.$collectionId === "TEMPORARY" && "opacity-50"}`}
     >
-      <Avatar />
+      <Avatar avatarId={user.avatar} />
       <div
         className={`inline-flex flex-col text-start justify-center gap-2 ${own && "order-first"}`}
       >

@@ -133,7 +133,7 @@ export default function RoomNavbar({
       className={`col-span-12 row-span-1 flex flex-row p-2 items-center mx-12 justify-between transition-all`}
     >
       <div className={"flex flex-row gap-4"}>
-        <Avatar />
+        <Avatar avatarId={room.avatar} />
         <div className={"flex flex-col text-start justify-center"}>
           <h3 className={"text-primary font-bold"}>{room.name}</h3>
           <h4>{room.description}</h4>
