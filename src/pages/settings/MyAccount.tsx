@@ -77,7 +77,7 @@ export const MyAccount = () => {
               icon={<FaPencil />}
               maxLength={30}
               required={true}
-              className={"max-w-32 md:w-full"}
+              className={"max-w-32 md:w-full md:max-w-full"}
             />
           </div>
         </div>
