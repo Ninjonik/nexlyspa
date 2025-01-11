@@ -10,7 +10,7 @@ const fireToast = (
     | "bottom-left"
     | "bottom-right"
     | "bottom-center" = "top-right",
-  closeAfter: number = 1500,
+  closeAfter: number = 3000,
 ) => {
   const options: ToastOptions = {
     position: textPosition,

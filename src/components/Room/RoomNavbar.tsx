@@ -6,7 +6,7 @@ import { account } from "../../utils/appwrite.ts";
 import RoomObject, {
   RoomObjectArray,
 } from "../../utils/interfaces/RoomObject.ts";
-import { useNavigate } from "react-router-dom";
+import { NavigateFunction, useLocation, useNavigate } from "react-router-dom";
 import { useRoomsContext } from "../../utils/RoomsContext.tsx";
 import { Dispatch, SetStateAction } from "react";
 import { ImPhoneHangUp } from "react-icons/im";
@@ -42,6 +42,49 @@ export const leaveTheCall = async (roomId: string) => {
   if (!response || !result.ok || !response.success) return;
 };
 
+export const leaveRoom = async (
+  roomId: string,
+  rooms: RoomObjectArray | null,
+  setRooms: React.Dispatch<SetStateAction<RoomObjectArray | null>>,
+  navigate: NavigateFunction,
+  pathname: string,
+) => {
+  const toastId = toast.loading("Leaving the room...");
+
+  const jwt = await account.createJWT();
+
+  const result = await fetch(
+    `${import.meta.env.VITE_PUBLIC_API_HOSTNAME}/leaveRoom`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        jwt: jwt.jwt,
+        roomId: roomId,
+      }),
+    },
+  );
+  const response = await result.json();
+  if (!response || !result.ok || !response.success) return;
+
+  if (rooms && Array.from(Object.keys(rooms)).length > 0) {
+    const newRooms: RoomObjectArray = { ...rooms };
+    delete newRooms[roomId];
+    console.log("OLD ROOMS BEFORE LEAVING:", rooms, roomId);
+    console.log("NEW ROOMS AFTER LEAVING: ", newRooms);
+    setRooms(newRooms);
+  }
+  toast.update(toastId, {
+    render: "Successfully left the room.",
+    type: "success",
+    isLoading: false,
+    autoClose: 2000,
+  });
+  if (pathname === `/room/${roomId}`) navigate("/home");
+};
+
 export default function RoomNavbar({
   room,
   inCall,
@@ -49,45 +92,9 @@ export default function RoomNavbar({
   sidebar,
   setSidebar,
 }: RoomNavbarProps) {
+  const location = useLocation();
   const navigate = useNavigate();
   const { rooms, setRooms } = useRoomsContext();
-
-  const leaveRoom = async (roomId: string) => {
-    const toastId = toast.loading("Leaving the room...");
-
-    const jwt = await account.createJWT();
-
-    const result = await fetch(
-      `${import.meta.env.VITE_PUBLIC_API_HOSTNAME}/leaveRoom`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          jwt: jwt.jwt,
-          roomId: roomId,
-        }),
-      },
-    );
-    const response = await result.json();
-    if (!response || !result.ok || !response.success) return;
-
-    if (rooms && Array.from(Object.keys(rooms)).length > 0) {
-      const newRooms: RoomObjectArray = { ...rooms };
-      delete newRooms[roomId];
-      console.log("OLD ROOMS BEFORE LEAVING:", rooms, roomId);
-      console.log("NEW ROOMS AFTER LEAVING: ", newRooms);
-      setRooms(newRooms);
-    }
-    toast.update(toastId, {
-      render: "Successfully left the room.",
-      type: "success",
-      isLoading: false,
-      autoClose: 2000,
-    });
-    navigate("/home");
-  };
 
   const handleLeaveCall = async (roomId: string) => {
     setInCall(false);
@@ -183,7 +190,9 @@ export default function RoomNavbar({
           className={"text-4xl hover:cursor-pointer"}
           transparent={true}
           position={"bottom"}
-          onClick={() => leaveRoom(room.$id)}
+          onClick={() =>
+            leaveRoom(room.$id, rooms, setRooms, navigate, location.pathname)
+          }
         >
           <IoMdExit />
         </Button>

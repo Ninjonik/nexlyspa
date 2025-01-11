@@ -73,8 +73,8 @@ export const Textarea = ({
     if (!message && attachmentsToSend.length < 1) return;
 
     /*
-              Upload all the attachments.
-          */
+        Upload all the attachments.
+    */
 
     let attachmentIds: string[] = [];
     if (attachmentsToSend.length > 0) {

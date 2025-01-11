@@ -28,6 +28,7 @@ export const Room = () => {
   const { roomId } = useParams();
   const [room, setRoom] = useState<null | RoomObject>(null);
   const [messages, setMessages] = useState<MessageObject[]>([]);
+  const [users, setUsers] = useState<UserObject[]>([]);
   const [optimisticMessages, setOptimisticMessages] = useState<MessageObject[]>(
     [],
   );
@@ -131,6 +132,7 @@ export const Room = () => {
       const res = await databases.getDocument(database, "rooms", roomId);
       if (!res) return;
       setRoom(res as RoomObject);
+      setUsers(res?.users || []);
     };
 
     setRoom(null);
@@ -148,6 +150,7 @@ export const Room = () => {
       (response) => {
         const payload = response.payload as RoomObject;
         setRoom(payload);
+        setUsers(payload?.users || []);
       },
     );
 
@@ -155,6 +158,30 @@ export const Room = () => {
       unsubscribeRoom();
     };
   }, [roomId]);
+
+  useEffect(() => {
+    if (room) {
+      const userList =
+        room?.users.map(
+          (user) =>
+            `databases.${database}.collections.users.documents.${user.$id}`,
+        ) || [];
+
+      const unsubscribeUsers = client.subscribe(userList, (response) => {
+        const payload = response.payload as UserObject;
+        setUsers((prevUsers) => {
+          const updatedUsers = prevUsers.map((user) =>
+            user.$id === payload.$id ? { ...payload } : user,
+          );
+          return updatedUsers;
+        });
+      });
+
+      return () => {
+        unsubscribeUsers();
+      };
+    }
+  }, [room]);
 
   useEffect(() => {
     if (room && room.$id) {
@@ -316,7 +343,7 @@ export const Room = () => {
             )}
           </h2>
           <div className={"flex flex-col gap-2"}>
-            {room.users.map((listUser: UserObject) => (
+            {users.map((listUser: UserObject) => (
               <UserListItem
                 key={listUser.$id + "_userSidebarList"}
                 user={listUser}

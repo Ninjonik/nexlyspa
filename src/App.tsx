@@ -6,6 +6,8 @@ import { RoomsContextProvider } from "./utils/RoomsContext.tsx";
 import "@livekit/components-styles";
 import { ToastContainer } from "react-toastify";
 import { SlideContextProvider } from "./utils/SlideContext.tsx";
+import HeartbeatService from "./components/HeartbeatService.tsx";
+import "./contexify.css";
 
 export const routeTransition = {
   initial: {
@@ -28,6 +30,7 @@ function App() {
             </SlideContextProvider>
           </ClientWrapper>
         </RoomsContextProvider>
+        <HeartbeatService />
       </UserContextProvider>
     </BrowserRouter>
   );

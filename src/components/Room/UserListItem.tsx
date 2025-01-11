@@ -4,6 +4,8 @@ import { FaCrown } from "react-icons/fa6";
 import { Label } from "../Label.tsx";
 import { Button } from "../../Button.tsx";
 import { RxCrossCircled } from "react-icons/rx";
+import truncate from "../../utils/truncate.ts";
+import checkUserStatus from "../../utils/checkUserStatus.ts";
 
 interface UserListItemProps {
   user: UserObject | null;
@@ -26,14 +28,14 @@ export const UserListItem = ({
       onContextMenu={() => {}}
     >
       <div className={"flex flex-row gap-4"}>
-        <Avatar avatarId={user?.avatar} />
+        <Avatar avatarId={user?.avatar} status={checkUserStatus(user)} />
         <div className={"flex flex-col text-start justify-center"}>
           <h3
             className={
               "text-primary font-bold flex flex-row items-center gap-1"
             }
           >
-            {user?.name}
+            {truncate(user?.name, 10)}
             {admin && (
               <Label title={"Admin of this group"}>
                 <span className={"text-yellow-500"}>

@@ -11,6 +11,7 @@ import { RiArrowDropDownLine } from "react-icons/ri";
 import { Settings } from "../pages/Settings.tsx";
 import { useState } from "react";
 import { Button } from "../Button.tsx";
+import truncate from "../utils/truncate.ts";
 // import { Version } from "./Version.tsx";
 
 export const Sidebar = () => {
@@ -89,7 +90,9 @@ export const Sidebar = () => {
                 "flex flex-col text-start justify-center overflow-hidden"
               }
             >
-              <h3 className={"text-primary font-bold max-w-24"}>{user.name}</h3>
+              <h3 className={"text-primary font-bold max-w-24"}>
+                {truncate(user.name, 10)}
+              </h3>
               <h4>{user.emailVerification ? "Verified" : "Not verified"}</h4>
             </div>
           </div>

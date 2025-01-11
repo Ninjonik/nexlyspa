@@ -39,6 +39,7 @@ export interface UserObject {
   $permissions: string[];
   rooms: RoomObject[];
   adminRooms: RoomObject[];
+  lastSeen?: string;
   $databaseId: string;
   $collectionId: string;
 }
