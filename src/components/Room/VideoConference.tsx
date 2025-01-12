@@ -20,21 +20,18 @@ import {
   VideoConferenceProps,
   WidgetState,
 } from "@livekit/components-react";
-import React from "react";
+import React, { useEffect } from "react";
 import { RoomEvent, Track } from "livekit-client";
 import { isEqualTrackRef, isWeb } from "@livekit/components-core";
-
-import Source = Track.Source;
 import { ImPhoneHangUp } from "react-icons/im";
+import { useLocalSettingsContext } from "../../utils/LocalSettingsContext.tsx";
+import Source = Track.Source;
 
 interface ExtendedVideoConferenceProps extends VideoConferenceProps {
   handleOnDisconnectedFn: () => void;
 }
 
 export default function VideoConference({
-  chatMessageFormatter,
-  chatMessageDecoder,
-  chatMessageEncoder,
   SettingsComponent,
   handleOnDisconnectedFn,
   ...props
@@ -46,6 +43,8 @@ export default function VideoConference({
   });
   const lastAutoFocusedScreenShareTrack =
     React.useRef<TrackReferenceOrPlaceholder | null>(null);
+
+  const { setLocalOptions } = useLocalSettingsContext();
 
   const tracks = useTracks(
     [
@@ -101,6 +100,15 @@ export default function VideoConference({
     focusTrack?.publication?.trackSid,
   ]);
 
+  const { options } = useLocalSettingsContext();
+  useEffect(() => {
+    if (options.deaf) {
+      tracks.forEach((publication) => (publication.participant.audioLevel = 0));
+    } else {
+      tracks.forEach((publication) => (publication.participant.audioLevel = 1));
+    }
+  }, [options]);
+
   return (
     <div className="lk-video-conference" {...props}>
       {isWeb() && (
@@ -130,7 +138,10 @@ export default function VideoConference({
               className={"flex flex-row justify-center items-center gap-4 p-2"}
             >
               <TrackToggle source={Source.Camera} />
-              <TrackToggle source={Source.Microphone} />
+              <TrackToggle
+                source={Source.Microphone}
+                onClick={() => setLocalOptions("muted")}
+              />
               <TrackToggle source={Source.ScreenShare} />
               <DisconnectButton onClick={handleOnDisconnectedFn}>
                 <ImPhoneHangUp />

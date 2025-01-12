@@ -13,16 +13,21 @@ import "dotenv/config";
 import * as dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-dotenv.config({ path: `${__dirname}/.env` });
-
 import fs from "fs";
 import http from "http";
 import https from "https";
 import becomeAdmin from "./routes/becomeAdmin.js";
+
+import { argv } from "node:process";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const dev = argv && argv.includes("dev");
+
+dev
+  ? dotenv.config({ path: `${__dirname}/.env.local` })
+  : dotenv.config({ path: `${__dirname}/.env` });
 
 const privKey = process.env.SSL_PRIV_KEY;
 const cert = process.env.SSL_CERT;
@@ -41,12 +46,16 @@ if (privKey && cert) {
   const credentials = { key: privateKey, cert: certificate };
   const httpsServer = https.createServer(credentials, app);
   httpsServer.listen(port, hostname, undefined, () => {
-    console.log(`Server running at https://${hostname}:${port}`);
+    console.log(
+      `Server running ${dev ? " in dev mode" : ""} at https://${hostname}:${port}`,
+    );
   });
 } else {
   const httpServer = http.createServer(app);
   httpServer.listen(port, hostname, undefined, () => {
-    console.log(`Server running at http://${hostname}:${port}`);
+    console.log(
+      `Server running${dev ? " in dev mode" : ""} at http://${hostname}:${port}`,
+    );
   });
 }
 

@@ -13,6 +13,7 @@ import { useState } from "react";
 import { Button } from "../Button.tsx";
 import truncate from "../utils/truncate.ts";
 import { PiMicrophoneFill, PiMicrophoneSlashFill } from "react-icons/pi";
+import { useLocalSettingsContext } from "../utils/LocalSettingsContext.tsx";
 // import { Version } from "./Version.tsx";
 
 export const Sidebar = () => {
@@ -21,43 +22,7 @@ export const Sidebar = () => {
   const { rooms } = useRoomsContext();
 
   const [shownSettings, setShownSettings] = useState<boolean>(false);
-  const [muted, setMuted] = useState<boolean>(
-    localStorage.getItem("muted") === "true",
-  );
-  const [deaf, setDeaf] = useState<boolean>(
-    localStorage.getItem("deaf") === "true",
-  );
-
-  const setLocalStorageSettings = async (key: string, value?: string) => {
-    if (!value) {
-      const current = localStorage.getItem(key) === "true" ?? false;
-      switch (key) {
-        case "muted":
-          console.log(current);
-          if (current) {
-            await navigator.mediaDevices
-              .getUserMedia({ audio: true })
-              .then(() => {
-                setMuted(!current);
-                localStorage.setItem(key, String(!current));
-              })
-              .catch(() => {});
-          } else {
-            localStorage.setItem(key, String(!current));
-            setMuted(!current);
-          }
-          break;
-        case "deaf":
-          localStorage.setItem(key, String(!current));
-          setDeaf(!current);
-          break;
-        default:
-          break;
-      }
-      return;
-    }
-    localStorage.setItem(key, value);
-  };
+  const { options, setLocalOptions } = useLocalSettingsContext();
 
   if (!user) return <FullscreenLoading />;
 
@@ -65,17 +30,17 @@ export const Sidebar = () => {
     <>
       <Button
         className={"font-bold text-xl transparent-button"}
-        text={muted ? "Unmute" : "Mute"}
-        onClick={() => setLocalStorageSettings("muted")}
+        text={options.muted ? "Unmute" : "Mute"}
+        onClick={() => setLocalOptions("muted")}
       >
-        {muted ? <PiMicrophoneSlashFill /> : <PiMicrophoneFill />}
+        {options.muted ? <PiMicrophoneSlashFill /> : <PiMicrophoneFill />}
       </Button>
       <Button
         className={"font-bold text-xl transparent-button"}
-        text={deaf ? "Undeafen" : "Deafen"}
-        onClick={() => setLocalStorageSettings("deaf")}
+        text={options.deaf ? "Undeafen" : "Deafen"}
+        onClick={() => setLocalOptions("deaf")}
       >
-        {deaf ? <TbHeadphonesOff /> : <TbHeadphones />}
+        {options.deaf ? <TbHeadphonesOff /> : <TbHeadphones />}
       </Button>
       <Button
         className={"font-bold text-xl transparent-button"}

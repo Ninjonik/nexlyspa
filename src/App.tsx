@@ -8,6 +8,7 @@ import { ToastContainer } from "react-toastify";
 import { SlideContextProvider } from "./utils/SlideContext.tsx";
 import HeartbeatService from "./components/HeartbeatService.tsx";
 import "./contexify.css";
+import { LocalSettingsContextProvider } from "./utils/LocalSettingsContext.tsx";
 
 export const routeTransition = {
   initial: {
@@ -21,17 +22,19 @@ export const routeTransition = {
 function App() {
   return (
     <BrowserRouter>
-      <UserContextProvider>
-        <RoomsContextProvider>
-          <ClientWrapper>
-            <SlideContextProvider>
-              <RoutesList />
-              <ToastContainer />
-            </SlideContextProvider>
-          </ClientWrapper>
-        </RoomsContextProvider>
-        <HeartbeatService />
-      </UserContextProvider>
+      <LocalSettingsContextProvider>
+        <UserContextProvider>
+          <RoomsContextProvider>
+            <ClientWrapper>
+              <SlideContextProvider>
+                <RoutesList />
+                <ToastContainer />
+              </SlideContextProvider>
+            </ClientWrapper>
+          </RoomsContextProvider>
+          <HeartbeatService />
+        </UserContextProvider>
+      </LocalSettingsContextProvider>
     </BrowserRouter>
   );
 }

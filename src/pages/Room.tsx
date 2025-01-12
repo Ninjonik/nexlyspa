@@ -22,6 +22,7 @@ import { toast } from "react-toastify";
 import { motion } from "framer-motion";
 import { pageTransitionOptions } from "../utils/constants.ts";
 import fireToast from "../utils/fireToast.ts";
+import { useLocalSettingsContext } from "../utils/LocalSettingsContext.tsx";
 
 export const Room = () => {
   const { user } = useUserContext();
@@ -43,6 +44,7 @@ export const Room = () => {
   const [sidebar, setSidebar] = useState<boolean>(true);
 
   const { slide, onTouchStart, onTouchMove, onTouchEnd } = useSlideContext();
+  const { options } = useLocalSettingsContext();
 
   const navigate = useNavigate();
 
@@ -267,7 +269,7 @@ export const Room = () => {
           >
             <LiveKitRoom
               video={false}
-              audio={localStorage.getItem("muted") === "true"}
+              audio={!options.muted}
               connect={inCall}
               token={token}
               serverUrl={import.meta.env.VITE_PUBLIC_LIVEKIT_URL}
