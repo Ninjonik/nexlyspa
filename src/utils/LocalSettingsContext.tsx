@@ -7,12 +7,16 @@ interface LocalSettingsContextProps {
 export interface LocalSettings {
   muted: boolean;
   deaf: boolean;
+  theme: "light" | "dark";
 }
 
 interface LocalSettingsContextValue {
   options: LocalSettings;
   setOptions: React.Dispatch<React.SetStateAction<LocalSettings>>;
-  setLocalOptions: (key: keyof LocalSettings, value?: boolean) => void;
+  setLocalOptions: (
+    key: keyof LocalSettings,
+    value?: boolean | string | number,
+  ) => void;
 }
 
 const LocalSettingsContext = createContext<
@@ -34,13 +38,14 @@ export const LocalSettingsContextProvider = ({
 }: LocalSettingsContextProps) => {
   const [options, setOptions] = useState<LocalSettings>(
     JSON.parse(
-      localStorage.getItem("options") ?? '{ "muted": false, "deaf": false }',
+      localStorage.getItem("options") ??
+        '{ "muted": false, "deaf": false, "theme": "dark" }',
     ),
   );
 
   const setLocalOptions = async (
     key: keyof typeof options,
-    value?: boolean,
+    value?: boolean | string | number,
   ) => {
     const currentOptions = options;
 
@@ -62,8 +67,7 @@ export const LocalSettingsContextProvider = ({
         break;
 
       default:
-        console.error(`Unknown key`);
-        return;
+        break;
     }
 
     // Update state and localStorage

@@ -11,6 +11,7 @@ export const AttachmentList = ({
   attachmentsData: getFileDataResult[];
   own: boolean;
 }) => {
+  if (!attachmentsData || attachmentsData.length === 0) return null;
   return (
     <div className={"flex flex-col gap-4"}>
       {attachmentsData &&

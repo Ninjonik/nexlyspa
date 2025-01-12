@@ -108,6 +108,7 @@ export default function VideoConference({
       tracks.forEach((publication) => (publication.participant.audioLevel = 1));
     }
   }, [options]);
+  // TODO: Make it so the deafen/undeafen functionality actually does work
 
   return (
     <div className="lk-video-conference" {...props}>

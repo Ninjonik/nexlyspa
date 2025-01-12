@@ -9,6 +9,7 @@ import { SlideContextProvider } from "./utils/SlideContext.tsx";
 import HeartbeatService from "./components/HeartbeatService.tsx";
 import "./contexify.css";
 import { LocalSettingsContextProvider } from "./utils/LocalSettingsContext.tsx";
+import "highlight.js/styles/github.css";
 
 export const routeTransition = {
   initial: {

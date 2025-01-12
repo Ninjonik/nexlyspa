@@ -301,16 +301,40 @@ export const Room = () => {
         )}
         <section
           className={
-            "bg-base-200 overflow-y-auto h-full flex flex-col-reverse w-full p-4 gap-4"
+            "bg-base-200 overflow-y-auto h-full flex flex-col-reverse w-full"
           }
           ref={messagesSectionRef}
         >
-          {optimisticMessages.map((message: MessageObject) => (
-            <Message key={message.$id} message={message} />
+          {optimisticMessages.map((message: MessageObject, index) => (
+            <Message
+              key={message.$id}
+              message={message}
+              showDetails={
+                index === 0 ||
+                optimisticMessages[index - 1].author.$id !== message.author.$id
+              }
+            />
           ))}
           <PhotoProvider>
-            {messages.map((message: MessageObject) => (
-              <Message key={message.$id} message={message} />
+            {messages.map((message: MessageObject, index) => (
+              <>
+                <Message
+                  key={message.$id}
+                  message={message}
+                  showDetails={
+                    index === messages.length - 1 ||
+                    messages[index + 1].author.$id !== message.author.$id ||
+                    new Date(messages[index + 1].$createdAt).getTime() -
+                      new Date(message.$createdAt).getTime() <=
+                      -600000
+                  }
+                />
+                {index !== messages.length - 1 &&
+                  console.log(
+                    new Date(messages[index + 1].$createdAt).getTime() -
+                      new Date(message.$createdAt).getTime(),
+                  )}
+              </>
             ))}
           </PhotoProvider>
         </section>
