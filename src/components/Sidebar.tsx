@@ -1,7 +1,7 @@
 import Avatar from "./Avatar.tsx";
 import { Link } from "react-router-dom";
-import { FaGear, FaHeadphones, FaMicrophone } from "react-icons/fa6";
-import { TbMessages } from "react-icons/tb";
+import { FaGear } from "react-icons/fa6";
+import { TbHeadphones, TbHeadphonesOff, TbMessages } from "react-icons/tb";
 import { useUserContext } from "../utils/UserContext.tsx";
 import { FullscreenLoading } from "./FullscreenLoading.tsx";
 import { RoomListItem } from "./sidebar/RoomListItem.tsx";
@@ -12,6 +12,8 @@ import { Settings } from "../pages/Settings.tsx";
 import { useState } from "react";
 import { Button } from "../Button.tsx";
 import truncate from "../utils/truncate.ts";
+import { PiMicrophoneFill, PiMicrophoneSlashFill } from "react-icons/pi";
+import { useLocalSettingsContext } from "../utils/LocalSettingsContext.tsx";
 // import { Version } from "./Version.tsx";
 
 export const Sidebar = () => {
@@ -20,6 +22,7 @@ export const Sidebar = () => {
   const { rooms } = useRoomsContext();
 
   const [shownSettings, setShownSettings] = useState<boolean>(false);
+  const { options, setLocalOptions } = useLocalSettingsContext();
 
   if (!user) return <FullscreenLoading />;
 
@@ -27,17 +30,17 @@ export const Sidebar = () => {
     <>
       <Button
         className={"font-bold text-xl transparent-button"}
-        text={"Mute/Unmute"}
-        onClick={() => setShownSettings(true)}
+        text={options.muted ? "Unmute" : "Mute"}
+        onClick={() => setLocalOptions("muted")}
       >
-        <FaMicrophone />
+        {options.muted ? <PiMicrophoneSlashFill /> : <PiMicrophoneFill />}
       </Button>
       <Button
         className={"font-bold text-xl transparent-button"}
-        text={"Deafen/Undeafen"}
-        onClick={() => setShownSettings(true)}
+        text={options.deaf ? "Undeafen" : "Deafen"}
+        onClick={() => setLocalOptions("deaf")}
       >
-        <FaHeadphones />
+        {options.deaf ? <TbHeadphonesOff /> : <TbHeadphones />}
       </Button>
       <Button
         className={"font-bold text-xl transparent-button"}

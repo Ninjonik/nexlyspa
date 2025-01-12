@@ -22,6 +22,7 @@ import { toast } from "react-toastify";
 import { motion } from "framer-motion";
 import { pageTransitionOptions } from "../utils/constants.ts";
 import fireToast from "../utils/fireToast.ts";
+import { useLocalSettingsContext } from "../utils/LocalSettingsContext.tsx";
 
 export const Room = () => {
   const { user } = useUserContext();
@@ -43,6 +44,7 @@ export const Room = () => {
   const [sidebar, setSidebar] = useState<boolean>(true);
 
   const { slide, onTouchStart, onTouchMove, onTouchEnd } = useSlideContext();
+  const { options } = useLocalSettingsContext();
 
   const navigate = useNavigate();
 
@@ -267,7 +269,7 @@ export const Room = () => {
           >
             <LiveKitRoom
               video={false}
-              audio={false}
+              audio={!options.muted}
               connect={inCall}
               token={token}
               serverUrl={import.meta.env.VITE_PUBLIC_LIVEKIT_URL}
@@ -299,16 +301,40 @@ export const Room = () => {
         )}
         <section
           className={
-            "bg-base-200 overflow-y-auto h-full flex flex-col-reverse w-full p-4 gap-4"
+            "bg-base-200 overflow-y-auto h-full flex flex-col-reverse w-full"
           }
           ref={messagesSectionRef}
         >
-          {optimisticMessages.map((message: MessageObject) => (
-            <Message key={message.$id} message={message} />
+          {optimisticMessages.map((message: MessageObject, index) => (
+            <Message
+              key={message.$id}
+              message={message}
+              showDetails={
+                index === 0 ||
+                optimisticMessages[index - 1].author.$id !== message.author.$id
+              }
+            />
           ))}
           <PhotoProvider>
-            {messages.map((message: MessageObject) => (
-              <Message key={message.$id} message={message} />
+            {messages.map((message: MessageObject, index) => (
+              <>
+                <Message
+                  key={message.$id}
+                  message={message}
+                  showDetails={
+                    index === messages.length - 1 ||
+                    messages[index + 1].author.$id !== message.author.$id ||
+                    new Date(messages[index + 1].$createdAt).getTime() -
+                      new Date(message.$createdAt).getTime() <=
+                      -600000
+                  }
+                />
+                {index !== messages.length - 1 &&
+                  console.log(
+                    new Date(messages[index + 1].$createdAt).getTime() -
+                      new Date(message.$createdAt).getTime(),
+                  )}
+              </>
             ))}
           </PhotoProvider>
         </section>

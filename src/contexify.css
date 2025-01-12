@@ -82,7 +82,7 @@
     height: 1px;
     cursor: default;
     margin: var(--contexify-separator-margin);
-    @apply bg-base-200;
+    @apply bg-base-300;
 }
 .contexify_willLeave-disabled {
     pointer-events: none;
@@ -259,5 +259,3 @@
     transform-origin: top center;
     animation: contexify_slideOut 0.3s;
 }
-
-/*# sourceMappingURL=ReactContexify.css.map */

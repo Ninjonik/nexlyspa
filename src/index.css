@@ -19,6 +19,9 @@
   input:not(.input-default){
     @apply input input-primary
   }
+  .code-copy-btn {
+    @apply absolute top-4 right-4 w-4 h-4 z-10;
+  }
 }
 
 @tailwind components;

@@ -1,40 +1,34 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { FaSun, FaMoon } from "react-icons/fa";
+import { useEffect } from "react";
+import { FaMoon, FaSun } from "react-icons/fa";
+import { useLocalSettingsContext } from "../utils/LocalSettingsContext.tsx";
 
 export const ThemeSelector = () => {
-  const [theme, setTheme] = useState("light");
+  const { options, setLocalOptions } = useLocalSettingsContext();
 
   const handleToggle = () => {
-    if (theme === "light") {
-      setTheme("dark");
+    if (options.theme === "light") {
+      setLocalOptions("theme", "dark");
     } else {
-      setTheme("light");
+      setLocalOptions("theme", "light");
     }
   };
 
   useEffect(() => {
-    const themeStr: string = localStorage.getItem("theme") || "light";
-    setTheme(themeStr);
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("theme", theme);
-    const localTheme = localStorage.getItem("theme");
     // @ts-expect-error it just works, leave it alone please c:
-    document.querySelector("html").setAttribute("data-theme", localTheme);
-  }, [theme]);
+    document.querySelector("html").setAttribute("data-theme", options.theme);
+  }, [options.theme]);
 
   return (
     <a
       className={"font-bold text-xl hover:cursor-pointer"}
       onClick={handleToggle}
     >
-      {theme === "light" ? (
-        <FaSun className="swap-on" />
-      ) : (
+      {options.theme === "light" ? (
         <FaMoon className="swap-off" />
+      ) : (
+        <FaSun className="swap-on" />
       )}
     </a>
   );
