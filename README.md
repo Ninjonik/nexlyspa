@@ -1,4 +1,4 @@
-# Nexly V3 - Built with React and Tauri
+# Nexly V3 - Built with React and Tauri and Appwrite
 
 ## Getting Started
 
