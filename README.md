@@ -18,8 +18,6 @@ bun dev
 node server/index.js
 ```
 
-Docker: soon
-
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 ## Contributing
